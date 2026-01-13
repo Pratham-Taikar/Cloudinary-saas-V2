@@ -4,8 +4,8 @@ export interface IVideo extends Document {
   title: string;
   description?: string;
   publicId: string;
-  originalSize?: string;
-  compressedSize?: string;
+  originalSize?: number;
+  compressedSize?: number;
   duration?: number;
   createdAt: Date;
   updatedAt: Date;
@@ -25,13 +25,15 @@ const videoSchema: Schema<IVideo> = new Schema(
       required: true,
     },
     originalSize: {
-      type: String,
+      type: Number,
+      required: true,
     },
     compressedSize: {
-      type: String,
+      type: Number,
     },
     duration: {
       type: Number,
+      required: true,
     },
   },
   { timestamps: true }
