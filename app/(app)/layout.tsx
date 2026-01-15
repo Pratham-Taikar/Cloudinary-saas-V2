@@ -15,7 +15,8 @@ import {
 
 const sidebarItems = [
   { href: "/home", icon: LayoutDashboardIcon, label: "Home Page" },
-  { href: "/social-share", icon: Share2Icon, label: "Social Share" },
+  { href: "/social-share", icon: Share2Icon, label: "Image Aspect Ratio" },
+  { href: "/add-effects", icon: UploadIcon, label: "Image Effects" },
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
 ];
 
@@ -84,9 +85,9 @@ export default function AppLayout({
                   </span>
                   <button
                     onClick={handleSignOut}
-                    className="btn btn-ghost btn-circle"
+                    className="btn btn-ghost btn-circle hover:border-2 hover:border-blue-800"
                   >
-                    <LogOutIcon className="h-6 w-6" />
+                    <LogOutIcon className="h-6 w-6 " />
                   </button>
                 </>
               )}
@@ -130,7 +131,7 @@ export default function AppLayout({
                 onClick={handleSignOut}
                 className="btn btn-outline btn-error w-full"
               >
-                <LogOutIcon className="mr-2 h-5 w-5" />
+                <LogOutIcon className="mr-2 h-5 w-5 hover:border-2" />
                 Sign Out
               </button>
             </div>
