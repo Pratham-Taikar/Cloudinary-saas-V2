@@ -10,13 +10,17 @@ import {
   LayoutDashboardIcon,
   Share2Icon,
   UploadIcon,
+  Brain,
+  Sparkles,
+  Proportions,
   ImageIcon,
 } from "lucide-react";
 
 const sidebarItems = [
   { href: "/home", icon: LayoutDashboardIcon, label: "Home Page" },
-  { href: "/social-share", icon: Share2Icon, label: "Image Aspect Ratio" },
-  { href: "/add-effects", icon: UploadIcon, label: "Image Effects" },
+  { href: "/social-share", icon: Proportions, label: "Image Aspect Ratio" },
+  { href: "/add-effects", icon: Sparkles, label: "Image Effects" },
+  { href: "/gen-background", icon: Brain, label: "Generative AI" },
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
 ];
 
