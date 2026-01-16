@@ -49,7 +49,7 @@ function GenerateBackground() {
     setBackgroundEffect(null);
 
     const name = file.name.slice(0, file.name.lastIndexOf("."));
-    setFileName(name); 
+    setFileName(name);
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
@@ -88,7 +88,7 @@ function GenerateBackground() {
           body: formData,
         });
 
-        if (!response.ok){
+        if (!response.ok) {
           toast.error("Failed to upload image")
           throw new Error("Failed to upload image")
         };
@@ -225,7 +225,7 @@ function GenerateBackground() {
                         crop="limit"
                         gravity="auto"
                         quality="auto"
-                        replaceBackground = {{
+                        replaceBackground={{
                           prompt: `${backgroundEffect}`
                         }}
                         restore={true}
