@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { CldImage } from "next-cloudinary";
+import toast from "react-hot-toast";
 
 const Filters = {
   none: "none",
@@ -87,15 +88,20 @@ function AddEffects() {
           body: formData,
         });
 
-        if (!response.ok) throw new Error("Failed to upload image");
+        if (!response.ok){
+          toast.error("Failed to upload image")
+          throw new Error("Failed to upload image")
+        };
 
         const data = await response.json();
         setUploadedImage(data.publicId);
         setIsTransforming(true);
 
+        toast.success("Image uploaded")
+
       } catch (error) {
         console.error(error);
-        alert("Failed to upload image");
+        toast.error("Failed to upload image")
       } finally {
         setIsUploading(false);
       }

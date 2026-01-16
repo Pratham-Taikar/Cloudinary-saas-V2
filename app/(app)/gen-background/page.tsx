@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { CldImage } from "next-cloudinary";
+import toast from "react-hot-toast";
 
 function GenerateBackground() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -13,6 +14,8 @@ function GenerateBackground() {
   const [isReuploading, setIsReuploading] = useState(false);
   const [fileName, setFileName] = useState("")
   const [inputLength, setInputLength] = useState<number>(0)
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const MAX_PIXELS = 25_000_000;
 
   const imageRef = React.useRef<HTMLImageElement>(null);
@@ -60,11 +63,19 @@ function GenerateBackground() {
 
       if (totalPixels > MAX_PIXELS) {
         setIsUploading(false);
-        alert(
-          `Image resolution too large (${Math.round(
-            totalPixels / 1_000_000
-          )} MP). Please upload an image under 25 MP.`
-        );
+
+        toast.error(`Image resolution too large (${Math.round(totalPixels / 1_000_000)
+          } MP). Please upload an image under 25 MP.`);
+
+        setFileName("");
+        setImageSize(null);
+        setIsReuploading(false);
+        setBackgroundEffect(null);
+
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+
         return;
       }
 
@@ -77,10 +88,15 @@ function GenerateBackground() {
           body: formData,
         });
 
-        if (!response.ok) throw new Error("Failed to upload image");
+        if (!response.ok){
+          toast.error("Failed to upload image")
+          throw new Error("Failed to upload image")
+        };
 
         const data = await response.json();
         setUploadedImage(data.publicId);
+
+        toast.success("Image uploaded")
       } catch {
         alert("Failed to upload image");
       } finally {
@@ -126,6 +142,7 @@ function GenerateBackground() {
 
           <input
             type="file"
+            ref={fileInputRef}
             onChange={handleFileUpload}
             className="file-input file-input-bordered file-input-primary w-full"
           />
