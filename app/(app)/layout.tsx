@@ -8,7 +8,6 @@ import {
   LogOutIcon,
   MenuIcon,
   LayoutDashboardIcon,
-  Share2Icon,
   UploadIcon,
   Brain,
   Sparkles,
@@ -21,6 +20,7 @@ const sidebarItems = [
   { href: "/social-share", icon: Proportions, label: "Image Aspect Ratio" },
   { href: "/add-effects", icon: Sparkles, label: "Image Effects" },
   { href: "/gen-background", icon: Brain, label: "Generative AI" },
+  { href: "/remove-background", icon: UploadIcon, label: "Remove Background" },
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
 ];
 
