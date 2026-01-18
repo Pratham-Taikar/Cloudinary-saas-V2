@@ -98,7 +98,7 @@ function GenerateBackground() {
 
         toast.success("Image uploaded")
       } catch {
-        alert("Failed to upload image");
+        toast.error("Failed to upload image");
       } finally {
         setIsUploading(false);
         setIsReuploading(false);
