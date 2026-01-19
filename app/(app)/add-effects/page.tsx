@@ -224,6 +224,7 @@ function AddEffects() {
                     height={imageSize.height}
                     crop="fill"
                     quality="auto"
+                    restore={true}
                     alt="Transformed"
                     effects={[
                       ...(filterFormat !== "none" ? [{ art: Filters[filterFormat] }] : []),

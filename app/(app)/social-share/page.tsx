@@ -137,6 +137,7 @@ export default function SocialShare() {
                     src={uploadedImage}
                     sizes="100vw"
                     alt="transformed image"
+                    restore={true}
                     crop="fill"
                     aspectRatio={socialFormats[selectedFormat].aspectRatio}
                     gravity='auto'

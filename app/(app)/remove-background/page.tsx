@@ -158,6 +158,7 @@ function AddEffects() {
                       width={imageSize.width}
                       height={imageSize.height}
                       crop="fill"
+                      restore={true}
                       gravity="auto"
                       quality="auto"
                       removeBackground={true}
