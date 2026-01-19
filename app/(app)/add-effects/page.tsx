@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CldImage } from "next-cloudinary";
 import toast from "react-hot-toast";
 
@@ -48,27 +48,39 @@ function AddEffects() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
-  const imageRef = React.useRef<HTMLImageElement>(null);
+  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
 
-  const [filterFormat, setFilterFormat] =
-    useState<FilterFormat>("alDente");
-  const [effectFormat, setEffectFormat] =
-    useState<EffectFormat>("cartoonify");
+  const [filterFormat, setFilterFormat] = useState<FilterFormat>("alDente");
+  const [effectFormat, setEffectFormat] = useState<EffectFormat>("cartoonify");
 
-  const [imageSize, setImageSize] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+  const MAX_PIXELS = 25_000_000; // 25 Megapixels
 
   useEffect(() => {
-    setIsTransforming(true)
-  }, [uploadedImage, filterFormat, effectFormat])
+    if (uploadedImage) setIsTransforming(true);
+  }, [uploadedImage, filterFormat, effectFormat]);
 
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const resetInputState = () => {
+    setUploadedImage(null);
+    setImageSize(null);
+    setIsTransforming(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File size too large. Max allowed size is 25 MB.");
+      resetInputState();
+      return;
+    }
 
     setIsUploading(true);
 
@@ -76,8 +88,23 @@ function AddEffects() {
     img.src = URL.createObjectURL(file);
 
     img.onload = async () => {
-      setImageSize({ width: img.width, height: img.height });
+      const width = img.width;
+      const height = img.height;
+      const totalPixels = width * height;
       URL.revokeObjectURL(img.src);
+
+      if (totalPixels > MAX_PIXELS) {
+        toast.error(
+          `Image resolution too large (${Math.round(
+            totalPixels / 1_000_000
+          )} MP). Please upload an image under 25 MP.`
+        );
+        resetInputState();
+        setIsUploading(false);
+        return;
+      }
+
+      setImageSize({ width, height });
 
       const formData = new FormData();
       formData.append("file", file);
@@ -88,23 +115,23 @@ function AddEffects() {
           body: formData,
         });
 
-        if (!response.ok){
-          toast.error("Failed to upload image")
-          throw new Error("Failed to upload image")
-        };
+        if (!response.ok) throw new Error("Upload failed");
 
         const data = await response.json();
         setUploadedImage(data.publicId);
-        setIsTransforming(true);
-
-        toast.success("Image uploaded")
-
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to upload image")
+        toast.success("Image uploaded");
+      } catch {
+        toast.error("Failed to upload image");
+        resetInputState();
       } finally {
         setIsUploading(false);
       }
+    };
+
+    img.onerror = () => {
+      toast.error("Invalid image file");
+      resetInputState();
+      setIsUploading(false);
     };
   };
 
@@ -112,50 +139,45 @@ function AddEffects() {
     if (!imageRef.current) return;
 
     fetch(imageRef.current.src)
-      .then((response) => response.blob())
+      .then((res) => res.blob())
       .then((blob) => {
-        const url = window.URL.createObjectURL(blob)
+        const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `${filterFormat.replace(/\s+/g, "_").toLowerCase()}_${effectFormat.replace(/\s+/g, "_").toLowerCase()}.png`;
+        link.download = `${filterFormat}_${effectFormat}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      })
+        URL.revokeObjectURL(url);
+      });
   };
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        Add Image Effects
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Add Image Effects</h1>
 
       <div className="card">
         <div className="card-body">
           <h2 className="card-title mb-4">Upload an Image</h2>
 
           <input
+            ref={fileInputRef}
             type="file"
+            accept="image/*"
             onChange={handleFileUpload}
             className="file-input file-input-bordered file-input-primary w-full"
           />
 
-          {isUploading && (
-            <progress className="progress progress-primary w-full mt-4" />
-          )}
+          {isUploading && <progress className="progress progress-primary w-full mt-4" />}
 
           {uploadedImage && imageSize && (
-            <div className="mt-6">
-
-              <h2 className="card-title mb-4 ">Select Filter</h2>
+            <>
+              <h2 className="card-title mt-6">Select Filter</h2>
 
               <select
                 className="select select-bordered w-full"
                 value={filterFormat}
-                onChange={(e) =>
-                  setFilterFormat(e.target.value as FilterFormat)
-                }
+                onChange={(e) => setFilterFormat(e.target.value as FilterFormat)}
               >
                 {Object.keys(Filters).map((key) => (
                   <option key={key} value={key}>
@@ -164,13 +186,12 @@ function AddEffects() {
                 ))}
               </select>
 
-              <h2 className="card-title mb-4 mt-4">Select Effect</h2>
+              <h2 className="card-title mt-4">Select Effect</h2>
+
               <select
                 className="select select-bordered w-full"
                 value={effectFormat}
-                onChange={(e) =>
-                  setEffectFormat(e.target.value as EffectFormat)
-                }
+                onChange={(e) => setEffectFormat(e.target.value as EffectFormat)}
               >
                 {Object.keys(Effects).map((key) => (
                   <option key={key} value={key}>
@@ -180,58 +201,45 @@ function AddEffects() {
               </select>
 
               <div className="mt-6 relative">
-                <h3 className="text-lg font-semibold mb-2">Preview:</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="grid">
-                    <h2>Original: </h2>
-                    <CldImage
-                      ref={imageRef}
-                      src={uploadedImage}
-                      width={imageSize.width}
-                      height={imageSize.height}
-                      crop="fill"
-                      gravity="auto"
-                      quality="auto"
-                      alt="Transformed preview"
-                    />
+                {isTransforming && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-50 z-10">
+                    <span className="loading loading-spinner loading-lg"></span>
                   </div>
-                  <div className="grid">
-                    {isTransforming && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-50 z-10">
-                        <span className="loading loading-spinner loading-lg"></span>
-                      </div>
-                    )}
-                    <h2>Transformed:</h2>
-                    <CldImage
-                      ref={imageRef}
-                      src={uploadedImage}
-                      width={imageSize.width}
-                      height={imageSize.height}
-                      crop="fill"
-                      gravity="auto"
-                      quality="auto"
-                      alt="Transformed preview"
-                      effects={[
-                        ...(filterFormat !== "none"
-                          ? [{ art: Filters[filterFormat] }]
-                          : []),
+                )}
 
-                        ...(effectFormat !== "none"
-                          ? [{ [Effects[effectFormat]]: true }]
-                          : []),
-                      ]}
-                      onLoad={() => setIsTransforming(false)}
-                    />
-                  </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <CldImage
+                    src={uploadedImage}
+                    width={imageSize.width}
+                    height={imageSize.height}
+                    crop="fill"
+                    quality="auto"
+                    alt="Original"
+                  />
+
+                  <CldImage
+                    ref={imageRef}
+                    src={uploadedImage}
+                    width={imageSize.width}
+                    height={imageSize.height}
+                    crop="fill"
+                    quality="auto"
+                    alt="Transformed"
+                    effects={[
+                      ...(filterFormat !== "none" ? [{ art: Filters[filterFormat] }] : []),
+                      ...(effectFormat !== "none" ? [{ [Effects[effectFormat]]: true }] : []),
+                    ]}
+                    onLoad={() => setIsTransforming(false)}
+                  />
+                </div>
+
+                <div className="card-actions justify-end mt-6">
+                  <button className="btn btn-primary" onClick={handleDownload}>
+                    Download
+                  </button>
                 </div>
               </div>
-
-              <div className="card-actions justify-end mt-6">
-                <button className="btn btn-primary" onClick={handleDownload}>
-                  Download for {filterFormat}_{effectFormat}
-                </button>
-              </div>
-            </div>
+            </>
           )}
         </div>
       </div>

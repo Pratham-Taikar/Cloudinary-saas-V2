@@ -117,6 +117,7 @@ function AddEffects() {
 
           <input
             type="file"
+            accept="image/*"
             onChange={handleFileUpload}
             className="file-input file-input-bordered file-input-primary w-full"
           />

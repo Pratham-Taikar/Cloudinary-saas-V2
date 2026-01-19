@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { CldImage } from 'next-cloudinary';
+import toast from 'react-hot-toast';
 
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
@@ -45,6 +46,7 @@ export default function SocialShare() {
       const data = await response.json();
       setUploadedImage(data.publicId);
 
+      toast.success("Image uploaded")
 
     } catch (error) {
       console.log(error)
@@ -90,6 +92,7 @@ export default function SocialShare() {
             </label>
             <input
               type="file"
+              accept='image/*'
               onChange={handleFileUpload}
               className="file-input file-input-bordered file-input-primary w-full"
             />

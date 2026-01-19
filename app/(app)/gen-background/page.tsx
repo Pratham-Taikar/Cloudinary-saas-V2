@@ -95,6 +95,7 @@ function GenerateBackground() {
 
         const data = await response.json();
         setUploadedImage(data.publicId);
+        setIsTransforming(true);
 
         toast.success("Image uploaded")
       } catch {
@@ -142,6 +143,7 @@ function GenerateBackground() {
 
           <input
             type="file"
+            accept='image/*'
             ref={fileInputRef}
             onChange={handleFileUpload}
             className="file-input file-input-bordered file-input-primary w-full"
