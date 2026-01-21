@@ -8,8 +8,9 @@ import {
   LogOutIcon,
   MenuIcon,
   LayoutDashboardIcon,
-  UploadIcon,
+  CloudUpload,
   Brain,
+  Wallpaper,
   Sparkles,
   Proportions,
   ImageIcon,
@@ -20,8 +21,8 @@ const sidebarItems = [
   { href: "/social-share", icon: Proportions, label: "Image Aspect Ratio" },
   { href: "/add-effects", icon: Sparkles, label: "Image Effects" },
   { href: "/gen-background", icon: Brain, label: "Generative AI" },
-  { href: "/remove-background", icon: UploadIcon, label: "Remove Background" },
-  { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
+  { href: "/remove-background", icon: Wallpaper, label: "Remove Background" },
+  { href: "/video-upload", icon: CloudUpload, label: "Video Upload" },
 ];
 
 export default function AppLayout({
@@ -109,7 +110,7 @@ export default function AppLayout({
         <label htmlFor="sidebar-drawer" className="drawer-overlay"></label>
         <aside className="bg-base-200 w-64 h-full flex flex-col">
           <div className="flex items-center justify-center py-4">
-            <ImageIcon className="w-10 h-10 text-primary" />
+            <img src="/weblogo-removebg-preview.png" alt="web-logo" width={150} onClick={handleLogoClick} className="hover:cursor-pointer"/>
           </div>
           <ul className="menu p-4 w-full text-base-content grow">
             {sidebarItems.map((item) => (

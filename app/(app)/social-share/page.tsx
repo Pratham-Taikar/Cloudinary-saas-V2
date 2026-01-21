@@ -20,6 +20,11 @@ export default function SocialShare() {
   const [isUploading, setIsUploading] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
+
+  const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+  const MAX_PIXELS = 25_000_000; // 25 Megapixels
 
 
   useEffect(() => {
@@ -28,32 +33,75 @@ export default function SocialShare() {
     }
   }, [selectedFormat, uploadedImage])
 
+  const resetInputState = () => {
+    setUploadedImage(null);
+    setIsTransforming(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
 
-    try {
-      const response = await fetch("/api/image-upload", {
-        method: "POST",
-        body: formData
-      })
-
-      if (!response.ok) throw new Error("Failed to upload image");
-
-      const data = await response.json();
-      setUploadedImage(data.publicId);
-
-      toast.success("Image uploaded")
-
-    } catch (error) {
-      console.log(error)
-      alert("Failed to upload image");
-    } finally {
-      setIsUploading(false);
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File size too large. Max allowed size is 25 MB.");
+      resetInputState();
+      return;
     }
+
+    setIsUploading(true);
+
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+
+    img.onload = async () => {
+      const width = img.width;
+      const height = img.height;
+      const totalPixels = width * height;
+      URL.revokeObjectURL(img.src);
+
+      if (totalPixels > MAX_PIXELS) {
+        toast.error(
+          `Image resolution too large (${Math.round(
+            totalPixels / 1_000_000
+          )} MP). Please upload an image under 25 MP.`
+        );
+        resetInputState();
+        setIsUploading(false);
+        return;
+      }
+
+      setImageSize({ width, height });
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("/api/image-upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error("Upload failed");
+
+        const data = await response.json();
+        setUploadedImage(data.publicId);
+        toast.success("Image uploaded");
+      } catch {
+        toast.error("Failed to upload image");
+        resetInputState();
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
+    img.onerror = () => {
+      toast.error("Invalid image file");
+      resetInputState();
+      setIsUploading(false);
+    };
   };
 
   const handleDownload = () => {
