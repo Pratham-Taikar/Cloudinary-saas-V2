@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { getCldVideoUrl } from "next-cloudinary";
-import { Download, Clock, FileDown, FileUp, DeleteIcon } from "lucide-react";
+import { Download, Clock, FileDown, FileUp } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { filesize } from "filesize";
@@ -19,12 +19,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [previewError, setPreviewError] = useState(false);
 
-  const getDownloadUrl = (publicId: string) => {
-    return getCldVideoUrl({
+  const getDownloadUrl = (publicId: string) =>
+    getCldVideoUrl({
       src: publicId,
-      flags: [`attachment`],
+      flags: ["attachment"],
     });
-  };
 
   const getThumbnailUrl = useCallback((publicId: string) => {
     return getCldVideoUrl({
@@ -41,10 +40,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   const getPreviewVideoUrl = useCallback((publicId: string) => {
     return getCldVideoUrl({
       src: publicId,
-      width: 400,
-      height: 225,
       rawTransformations: [
-        "e_preview:duration_15:max_seg_9:min_seg_dur_1",
+        "e_preview:duration_12:max_seg_8:min_seg_dur_1",
+        "q_auto:eco",
+        "vc_auto",
+        "br_500k",
       ],
     });
   }, []);
@@ -52,41 +52,37 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   const getFullVideoUrl = useCallback((publicId: string) => {
     return getCldVideoUrl({
       src: publicId,
-      width: 1920,
-      height: 1080,
+      rawTransformations: [
+        "q_auto:good", 
+        "vc_auto",    
+        "br_auto",     
+      ],
     });
   }, []);
 
-  const formatSize = useCallback((size: number) => {
-    return filesize(size);
-  }, []);
+  const formatSize = useCallback((size: number) => filesize(size), []);
 
   const formatDuration = useCallback((seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.round(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+    const m = Math.floor(seconds / 60);
+    const s = Math.round(seconds % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${m}:${s}`;
   }, []);
 
-
-  const originalSize = Number(video.originalSize) || 0;
-  const compressedSize =
-    Number(video.compressedSize) || originalSize;
+  const originalSize = video.originalSize ?? 0;
+  const compressedSize = video.compressedSize ?? null;
 
   const compressionPercentage =
-    originalSize > 0
+    compressedSize && originalSize > 0
       ? Math.round((1 - compressedSize / originalSize) * 100)
-      : 0;
+      : null;
 
-  const safeDuration = Number(video.duration) ?? 0;
+  const safeDuration = Number(video.duration) || 0;
 
   useEffect(() => {
     setPreviewError(false);
   }, [isHovered]);
-
-  const handlePreviewError = () => {
-    setPreviewError(true);
-  };
-
 
   return (
     <div
@@ -108,8 +104,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
               autoPlay
               muted
               loop
+              playsInline
               className="w-full h-full object-cover"
-              onError={handlePreviewError}
+              onError={() => setPreviewError(true)}
             />
           )
         ) : (
@@ -120,7 +117,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           />
         )}
 
-        <div className="absolute bottom-2 right-2 bg-base-100 bg-opacity-70 px-2 py-1 rounded-lg text-sm flex items-center">
+        <div className="absolute bottom-2 right-2 bg-base-100/80 px-2 py-1 rounded-lg text-sm flex items-center">
           <Clock size={16} className="mr-1" />
           {formatDuration(safeDuration)}
         </div>
@@ -153,8 +150,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           <div className="flex items-center">
             <FileDown size={18} className="mr-2 text-secondary" />
             <div>
-              <div className="font-semibold">Compressed</div>
-              <div>{formatSize(compressedSize)}</div>
+              <div className="font-semibold">Optimized</div>
+              <div>
+                {compressedSize
+                  ? formatSize(compressedSize)
+                  : "Auto"}
+              </div>
             </div>
           </div>
         </div>
@@ -163,13 +164,20 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           <div className="text-sm font-semibold">
             Compression:{" "}
             <span className="text-accent">
-              {compressionPercentage}%
+              {compressionPercentage !== null
+                ? `${compressionPercentage}%`
+                : "Smart"}
             </span>
           </div>
 
           <button
             className="btn btn-primary btn-sm"
-            onClick={() => onDownload(getDownloadUrl(video.publicId), video.title)}
+            onClick={() =>
+              onDownload(
+                getDownloadUrl(video.publicId),
+                video.title
+              )
+            }
           >
             <Download size={16} />
           </button>

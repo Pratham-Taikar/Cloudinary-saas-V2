@@ -10,8 +10,10 @@ function VideoUpload() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+
   const router = useRouter();
 
   const MAX_FILE_SIZE = 100 * 1024 * 1024;
@@ -53,6 +55,14 @@ function VideoUpload() {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        onUploadProgress: (progressEvent) => {
+          if (!progressEvent.total) return;
+
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percent);
+        },
       });
 
       toast.success("Video uploaded successfully");
@@ -62,6 +72,7 @@ function VideoUpload() {
       toast.error("Failed to upload video");
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -101,12 +112,27 @@ function VideoUpload() {
           <input
             ref={fileInputRef}
             type="file"
+            disabled={isUploading}
             accept="video/mp4,video/webm,video/ogg"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="file-input file-input-bordered w-full"
             required
           />
         </div>
+
+        {isUploading && (
+          <div className="space-y-1">
+            <div className="w-full h-3 bg-gray-200 rounded overflow-hidden">
+              <div
+                className="h-full bg-blue-600 transition-all duration-200"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <p className="text-sm text-gray-600">
+              Uploading… {uploadProgress}%
+            </p>
+          </div>
+        )}
 
         <button
           type="submit"

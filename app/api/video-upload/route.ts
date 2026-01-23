@@ -45,8 +45,8 @@ export async function POST( request: NextRequest ){
     const file = formdata.get("file") as File | null 
     const title = formdata.get("title") as string | null
     const description = formdata.get("description") as string | null
-    const originalSizeStr = formdata.get("originalSize") as string | null;
-    const originalSize = originalSizeStr ? parseInt(originalSizeStr) : 0;
+    const originalSizeStr = formdata.get("originalSize") as Number | null;
+    const originalSize = originalSizeStr ? originalSizeStr : 0;
 
     if( !file ){
       return NextResponse.json(
