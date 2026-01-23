@@ -14,11 +14,12 @@ const Filters = {
   eucalyptus: "eucalyptus",
   fes: "fes",
   frost: "frost",
+  hairspray: "hairspray",
   hokusai: "hokusai",
   incognito: "incognito",
   linen: "linen",
   peacock: "peacock",
-  primrose: "primrose",
+  primavera: "primavera",
   quartz: "quartz",
   redRock: "red_rock",
   refresh: "refresh",
@@ -34,10 +35,10 @@ const Effects = {
   none: "none",
   cartoonify: "cartoonify",
   vectorize: "vectorize",
-  oilPaint: "oil_paint",
   watercolor: "watercolor",
   sepia: "sepia",
   grayscale: "grayscale",
+  vignette: "vignette",
   blackwhite: "blackwhite",
   negate: "negate",
 };
@@ -55,6 +56,7 @@ function AddEffects() {
 
   const imageRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState("")
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
   const MAX_PIXELS = 25_000_000; // 25 Megapixels
@@ -65,6 +67,8 @@ function AddEffects() {
 
   const resetInputState = () => {
     setUploadedImage(null);
+    setImageSize(null);
+    setFileName("");
     setImageSize(null);
     setIsTransforming(false);
     if (fileInputRef.current) {
@@ -201,6 +205,7 @@ function AddEffects() {
               </select>
 
               <div className="mt-6 relative">
+                <h3 className="text-lg font-semibold mb-2">Preview:</h3>
                 {isTransforming && (
                   <div className="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-50 z-10">
                     <span className="loading loading-spinner loading-lg"></span>
@@ -208,30 +213,36 @@ function AddEffects() {
                 )}
 
                 <div className="grid grid-cols-2 gap-2">
-                  <CldImage
-                    src={uploadedImage}
-                    width={imageSize.width}
-                    height={imageSize.height}
-                    crop="fill"
-                    quality="auto"
-                    alt="Original"
-                  />
+                  <div className="grid">
+                    <h2 className="font-semibold">Original:</h2>
+                    <CldImage
+                      src={uploadedImage}
+                      width={imageSize.width}
+                      height={imageSize.height}
+                      crop="fill"
+                      quality="auto"
+                      alt="Original"
+                    />
+                  </div>
 
-                  <CldImage
-                    ref={imageRef}
-                    src={uploadedImage}
-                    width={imageSize.width}
-                    height={imageSize.height}
-                    crop="fill"
-                    quality="auto"
-                    restore={true}
-                    alt="Transformed"
-                    effects={[
-                      ...(filterFormat !== "none" ? [{ art: Filters[filterFormat] }] : []),
-                      ...(effectFormat !== "none" ? [{ [Effects[effectFormat]]: true }] : []),
-                    ]}
-                    onLoad={() => setIsTransforming(false)}
-                  />
+                  <div className="grid">
+                    <h2 className="font-semibold">Transformed: </h2>
+                    <CldImage
+                      ref={imageRef}
+                      src={uploadedImage}
+                      width={imageSize.width}
+                      height={imageSize.height}
+                      crop="fill"
+                      quality="auto"
+                      restore={true}
+                      alt="Transformed"
+                      effects={[
+                        ...(filterFormat !== "none" ? [{ art: Filters[filterFormat] }] : []),
+                        ...(effectFormat !== "none" ? [{ [Effects[effectFormat]]: true }] : []),
+                      ]}
+                      onLoad={() => setIsTransforming(false)}
+                    />
+                  </div>
                 </div>
 
                 <div className="card-actions justify-end mt-6">

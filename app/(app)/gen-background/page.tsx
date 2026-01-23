@@ -192,14 +192,13 @@ function GenerateBackground() {
               )}
 
 
-              {hasGenerated && (
+              {hasGenerated && uploadedImage && (
                 <div className="mt-6 relative">
                   {isTransforming && (
                     <div className="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-50 z-10">
                       <span className="loading loading-spinner loading-lg"></span>
                     </div>
                   )}
-
                   <h3 className="text-lg font-bold mb-2">Preview:</h3>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -219,20 +218,17 @@ function GenerateBackground() {
                     <div className="grid">
                       <h2 className="font-semibold">Transformed:</h2>
                       <CldImage
-                        key={transformKey}
-                        ref={imageRef}
                         src={uploadedImage}
                         width={Math.min(imageSize.width, 2048)}
                         height={Math.min(imageSize.height, 2048)}
                         crop="limit"
                         gravity="auto"
                         quality="auto"
-                        replaceBackground={{
-                          prompt: `${backgroundEffect}`
-                        }}
-                        restore={true}
+                        removeBackground
+                        restore
+                        background="transparent"
+                        format="png"
                         alt="Generated image"
-                        onLoad={() => setIsTransforming(false)}
                       />
                     </div>
                   </div>

@@ -21,7 +21,6 @@ export default function SocialShare() {
   const [isTransforming, setIsTransforming] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
   const MAX_PIXELS = 25_000_000; // 25 Megapixels
@@ -72,8 +71,6 @@ export default function SocialShare() {
         setIsUploading(false);
         return;
       }
-
-      setImageSize({ width, height });
 
       const formData = new FormData();
       formData.append("file", file);
