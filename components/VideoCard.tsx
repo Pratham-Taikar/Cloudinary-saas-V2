@@ -101,6 +101,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           ) : (
             <video
               src={getPreviewVideoUrl(video.publicId)}
+              preload="metadata"
               autoPlay
               muted
               loop

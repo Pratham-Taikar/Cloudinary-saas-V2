@@ -30,7 +30,6 @@ const videoSchema: Schema<IVideo> = new Schema(
     },
     compressedSize: {
       type: Number,
-      required: true,
     },
     duration: {
       type: Number,
