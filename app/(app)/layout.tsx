@@ -14,6 +14,7 @@ import {
   Sparkles,
   Proportions,
   ImageIcon,
+  UserCog
 } from "lucide-react";
 
 const sidebarItems = [
@@ -110,7 +111,7 @@ export default function AppLayout({
         <label htmlFor="sidebar-drawer" className="drawer-overlay"></label>
         <aside className="bg-base-200 w-64 h-full flex flex-col">
           <div className="flex items-center justify-center py-4">
-            <img src="/weblogo-removebg-preview.png" alt="web-logo" width={150} onClick={handleLogoClick} className="hover:cursor-pointer"/>
+            <img src="/weblogo-removebg-preview.png" alt="web-logo" width={125} onClick={handleLogoClick} className="hover:cursor-pointer"/>
           </div>
           <ul className="menu p-4 w-full text-base-content grow">
             {sidebarItems.map((item) => (
@@ -132,6 +133,20 @@ export default function AppLayout({
           </ul>
           {user && (
             <div className="p-4">
+              <div>
+                <Link
+                href={"/user-dashboard"}
+                  className={`flex items-center space-x-4 mb-2  border-2 border-base-200 px-4 py-2 rounded-lg 
+                    ${pathname === "/user-dashboard"
+                      ? "bg-primary text-white"
+                      : "hover:bg-base-300"
+                    }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <UserCog className="w-6 h-6" />
+                  <span>Dashboard</span>
+                </Link>
+              </div>
               <button
                 onClick={handleSignOut}
                 className="btn btn-outline btn-error w-full"
