@@ -82,6 +82,7 @@ export async function POST( request: NextRequest ){
       title: title || "No Title",
       description: description || "",
       originalSize: Number(originalSize) || 0,
+      userId: String(userId),
       publicId: String(promise.public_id),
       duration: Number(promise.duration) | 0,
     })

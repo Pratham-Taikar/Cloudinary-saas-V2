@@ -4,6 +4,7 @@ export interface IVideo extends Document {
   title: string;
   description?: string;
   publicId: string;
+  userId: string;
   originalSize?: number;
   compressedSize?: number;
   duration?: number;
@@ -21,6 +22,10 @@ const videoSchema: Schema<IVideo> = new Schema(
       type: String,
     },
     publicId: {
+      type: String,
+      required: true,
+    },
+    userId: {
       type: String,
       required: true,
     },
