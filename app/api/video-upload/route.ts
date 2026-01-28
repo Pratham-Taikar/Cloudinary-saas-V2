@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary'
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server';
 import Video from '@/models/video.models';
+import User from '@/models/user.models';
 import connectDB from '@/lib/db';
 
 cloudinary.config({
@@ -17,6 +18,8 @@ interface CloudinaryUploadResult{
   [key: number] : any
 }
 
+const MAX_FREE_VIDEOS = 5;
+
 export async function POST( request: NextRequest ){
  
   try {
@@ -31,6 +34,18 @@ export async function POST( request: NextRequest ){
     }
 
     await connectDB();
+
+    const user = await User.findOne({ userId });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (!user.isSubscribed && user.videoCount >= MAX_FREE_VIDEOS) {
+      return NextResponse.json(
+        { error: "Video limit reached. Upgrade required." },
+        { status: 403 }
+      );
+    }
 
     if( !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 
       !process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || 
@@ -94,8 +109,17 @@ export async function POST( request: NextRequest ){
       )
     }
 
+    const updatedUser = await Video.findOneAndUpdate(
+      { userId: userId },
+      { $inc: { videoCount: 1 } },
+      { new: true }
+    )
+
     return NextResponse.json(
-      { video },
+      { 
+        video,
+        updatedUser
+      },
       { status: 201 }
     )
 
