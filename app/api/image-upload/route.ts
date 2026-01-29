@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { auth } from "@clerk/nextjs/server";
 import connectDB from "@/lib/db";
 import User from "@/models/user.models";
+import services from "@/lib/services";
 
 export const runtime = "nodejs";
 
@@ -11,8 +12,6 @@ cloudinary.config({
     api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-const MAX_FREE_IMAGES = 10;
 
 export async function POST(request: NextRequest) {
     const { userId } = await auth();
@@ -25,11 +24,14 @@ export async function POST(request: NextRequest) {
         await connectDB();
 
         const user = await User.findOne({ userId });
+
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        if (!user.isSubscribed && user.imageCount >= MAX_FREE_IMAGES) {
+        const plan = user.isSubscribed ? services.elite : services.free;
+
+        if (!user.isSubscribed && user.imageCount >= plan.imageLimit) {
             return NextResponse.json(
                 { error: "Image limit reached. Upgrade required." },
                 { status: 403 }

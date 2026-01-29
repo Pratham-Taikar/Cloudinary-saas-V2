@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import services from "@/lib/services";
 
 interface User {
   userId: string;
@@ -12,9 +13,6 @@ interface User {
   videoCount: number;
   isSubscribed: boolean;
 }
-
-const MAX_FREE_VIDEOS = 5;
-const MAX_FREE_IMAGES = 10;
 
 function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -40,9 +38,18 @@ function Dashboard() {
   if (loading) return <div className="text-center">Loading...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
   if (!user) return <div className="text-center">User not found</div>;
+  
+  const plan = user.isSubscribed ? services.elite : services.free;
 
-  const remainingVideos = Math.max(MAX_FREE_VIDEOS - user.videoCount, 0);
-  const remainingImages = Math.max(MAX_FREE_IMAGES - user.imageCount, 0);
+  const remainingVideos = Math.max(
+    plan.videoLimit - user.videoCount,
+    0
+  );
+
+  const remainingImages = Math.max(
+    plan.imageLimit - user.imageCount,
+    0
+  );
 
   return (
     <div className="relative min-h-screen">
@@ -71,7 +78,7 @@ function Dashboard() {
             <p className="mt-2 text-sm">
               Plan:{" "}
               <span className="font-semibold">
-                {user.isSubscribed ? "Elite" : "Free"}
+                {plan.name}
               </span>
             </p>
           </div>
@@ -88,25 +95,31 @@ function Dashboard() {
             </h2>
 
             <p className="text-sm mb-1">
-              Videos used: {user.videoCount} / {MAX_FREE_VIDEOS}
+              Videos used: {user.videoCount} / {plan.videoLimit}
             </p>
             <div className="w-full bg-white/10 h-2 rounded mb-4 overflow-hidden">
               <div
                 className="bg-primary h-2"
                 style={{
-                  width: `${(user.videoCount / MAX_FREE_VIDEOS) * 100}%`,
+                  width: `${Math.min(
+                    (user.videoCount / plan.videoLimit) * 100,
+                    100
+                  )}%`,
                 }}
               />
             </div>
 
             <p className="text-sm mb-1">
-              Images used: {user.imageCount} / {MAX_FREE_IMAGES}
+              Images used: {user.imageCount} / {plan.imageLimit}
             </p>
             <div className="w-full bg-white/10 h-2 rounded overflow-hidden">
               <div
                 className="bg-secondary h-2"
                 style={{
-                  width: `${(user.imageCount / MAX_FREE_IMAGES) * 100}%`,
+                  width: `${Math.min(
+                    (user.imageCount / plan.imageLimit) * 100,
+                    100
+                  )}%`,
                 }}
               />
             </div>
@@ -131,7 +144,7 @@ function Dashboard() {
 
             {!user.isSubscribed && (
               <button className="btn btn-primary mt-6 rounded-xl">
-                Upgrade to Elite
+                Upgrade to {services.elite.name}
               </button>
             )}
           </div>

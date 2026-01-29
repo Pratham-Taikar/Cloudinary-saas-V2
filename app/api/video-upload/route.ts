@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import Video from '@/models/video.models';
 import User from '@/models/user.models';
 import connectDB from '@/lib/db';
+import services from '@/lib/services';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -36,11 +37,14 @@ export async function POST( request: NextRequest ){
     await connectDB();
 
     const user = await User.findOne({ userId });
+
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (!user.isSubscribed && user.videoCount >= MAX_FREE_VIDEOS) {
+    const plan = user.isSubscribed ? services.elite : services.free;
+
+    if (!user.isSubscribed && user.videoCount >= plan.videoLimit) {
       return NextResponse.json(
         { error: "Video limit reached. Upgrade required." },
         { status: 403 }
