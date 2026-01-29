@@ -7,9 +7,9 @@ const services = {
   },
   elite: {
     name: "Elite",
-    videoLimit: 15,
-    imageLimit: 50,
-    price: 49,
+    videoLimit: 20,
+    imageLimit: 75,
+    price: 99,
   },
 }
 

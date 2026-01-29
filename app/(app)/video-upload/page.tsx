@@ -16,7 +16,7 @@ function VideoUpload() {
 
   const router = useRouter();
 
-  const MAX_FILE_SIZE = 100 * 1024 * 1024;
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; //10mb
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +33,8 @@ function VideoUpload() {
       return;
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("File size is too large (Max 100MB)");
+    if (file.size >= MAX_FILE_SIZE) {
+      toast.error("File size is too large (Max 10MB)");
       setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";

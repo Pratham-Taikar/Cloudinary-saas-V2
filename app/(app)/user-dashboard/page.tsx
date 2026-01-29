@@ -2,8 +2,8 @@
 
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import services from "@/lib/services";
-
 interface User {
   userId: string;
   email: string;
@@ -24,7 +24,6 @@ function Dashboard() {
       const res = await axios.get("/api/user");
       setUser(res.data);
     } catch (err) {
-      console.log(err);
       setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
@@ -51,12 +50,17 @@ function Dashboard() {
     0
   );
 
+  const imagelimitReached = remainingImages === 0 
+  const videoLimitReached = remainingVideos === 0
+
   return (
     <div className="relative min-h-screen">
       <div className="container mx-auto p-6 max-w-6xl space-y-10">
-        <h1 className="text-3xl font-bold text-center tracking-tight">
-          Dashboard
-        </h1>
+        { imagelimitReached && videoLimitReached && (
+          <div className="text-center text-red-500 font-semibold text-xl">
+            Your plan has reached maximum uploads. Please upgrade to increase upload limit.
+          </div>
+        )}
 
         <div className="flex items-center gap-6 rounded-2xl p-6
           bg-white/10 dark:bg-black/20
@@ -85,21 +89,24 @@ function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="rounded-2xl p-6
+          <div className={`rounded-2xl p-6
             bg-white/10 dark:bg-black/20
             backdrop-blur-xl
-            border border-white/10
-            shadow-lg">
+            border 
+            shadow-lg
+            ${ imagelimitReached && videoLimitReached ? "border-red-500" : "border-white/10"}
+            `}>
             <h2 className="text-lg font-semibold mb-4">
               Usage Summary
             </h2>
-
             <p className="text-sm mb-1">
               Videos used: {user.videoCount} / {plan.videoLimit}
             </p>
             <div className="w-full bg-white/10 h-2 rounded mb-4 overflow-hidden">
               <div
-                className="bg-primary h-2"
+                className={`h-2
+                  ${ videoLimitReached ? "bg-red-500" : "bg-primary" }
+                  `}
                 style={{
                   width: `${Math.min(
                     (user.videoCount / plan.videoLimit) * 100,
@@ -108,13 +115,14 @@ function Dashboard() {
                 }}
               />
             </div>
-
             <p className="text-sm mb-1">
               Images used: {user.imageCount} / {plan.imageLimit}
             </p>
             <div className="w-full bg-white/10 h-2 rounded overflow-hidden">
               <div
-                className="bg-secondary h-2"
+                className={`h-2
+                  ${ imagelimitReached ? "bg-red-500" : "bg-secondary" }
+                  `}
                 style={{
                   width: `${Math.min(
                     (user.imageCount / plan.imageLimit) * 100,
