@@ -109,7 +109,7 @@ export async function POST( request: NextRequest ){
       )
     }
 
-    const updatedUser = await Video.findOneAndUpdate(
+    const updatedUser = await User.findOneAndUpdate(
       { userId: userId },
       { $inc: { videoCount: 1 } },
       { new: true }
