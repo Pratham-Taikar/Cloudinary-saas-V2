@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { CldImage } from 'next-cloudinary';
 import toast from 'react-hot-toast';
+import services from '@/lib/services';
+import LimitReached from '@/components/limitValidator';
 
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
@@ -21,6 +23,8 @@ export default function SocialShare() {
   const [isTransforming, setIsTransforming] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [user, setUser] = useState<any>(null);
+  const [checkingLimit, setCheckingLimit] = useState(true);
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
   const MAX_PIXELS = 25_000_000; // 25 Megapixels
@@ -39,6 +43,22 @@ export default function SocialShare() {
       fileInputRef.current.value = "";
     }
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user");
+        const data = await res.json();
+        setUser(data);
+      } catch {
+        toast.error("Failed to load user");
+      } finally {
+        setCheckingLimit(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -121,6 +141,30 @@ export default function SocialShare() {
       })
   }
 
+  if (checkingLimit) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (user) {
+    const plan = user.isSubscribed
+      ? services.elite
+      : services.free;
+
+    if (user.imageCount >= plan.imageLimit) {
+      return (
+        <LimitReached
+          type="image"
+          used={user.imageCount}
+          limit={plan.imageLimit}
+          plan={user.isSubscribed ? "elite" : "free"}
+        />
+      );
+    }
+  }
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">

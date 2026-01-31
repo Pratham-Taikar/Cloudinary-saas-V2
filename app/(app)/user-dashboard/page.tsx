@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import services from "@/lib/services";
 interface User {
   userId: string;
@@ -151,9 +151,11 @@ function Dashboard() {
             </div>
 
             {!user.isSubscribed && (
-              <button className="btn btn-primary mt-6 rounded-xl">
-                Upgrade to {services.elite.name}
-              </button>
+              <Link href="/billings">
+                <button className="btn btn-primary mt-6 w-full rounded-xl">
+                  Upgrade to {services.elite.name}
+                </button>
+              </Link>
             )}
           </div>
         </div>
