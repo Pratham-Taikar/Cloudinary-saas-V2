@@ -1,9 +1,21 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import LimitReached from "@/components/limitValidator";
+import services from "@/lib/services";
+
+interface User {
+  userId: string;
+  email: string;
+  username?: string;
+  avatarUrl?: string;
+  imageCount: number;
+  videoCount: number;
+  isSubscribed: boolean;
+}
 
 function VideoUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -12,9 +24,27 @@ function VideoUpload() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+  const [checkingLimit, setCheckingLimit] = useState(true);
 
 
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user");
+        const data = await res.json();
+        setUser(data);
+      } catch {
+        toast.error("Failed to load user");
+      } finally {
+        setCheckingLimit(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; //10mb
 
@@ -75,6 +105,31 @@ function VideoUpload() {
       setUploadProgress(0);
     }
   };
+
+  if (checkingLimit) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (user) {
+    const plan = user.isSubscribed
+      ? services.elite
+      : services.free;
+
+    if (user.videoCount >= plan.videoLimit) {
+      return (
+        <LimitReached
+          type="video"
+          used={user.videoCount}
+          limit={plan.videoLimit}
+          plan={user.isSubscribed ? "elite" : "free"}
+        />
+      );
+    }
+  }
 
   return (
     <div className="container mx-auto p-4">

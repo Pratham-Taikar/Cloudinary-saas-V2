@@ -3,6 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { CldImage } from "next-cloudinary";
 import toast from "react-hot-toast";
+import LimitReached from "@/components/limitValidator";
+import services from "@/lib/services";
+
+interface User {
+  userId: string;
+  email: string;
+  username?: string;
+  avatarUrl?: string;
+  imageCount: number;
+  videoCount: number;
+  isSubscribed: boolean;
+}
 
 function AddEffects() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -11,6 +23,8 @@ function AddEffects() {
   const imageRef = React.useRef<HTMLImageElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState("")
+  const [user, setUser] = useState<User | null>(null);
+  const [checkingLimit, setCheckingLimit] = useState(true);
 
   const MAX_PIXELS = 25_000_000;
 
@@ -22,6 +36,22 @@ function AddEffects() {
   useEffect(() => {
     setIsTransforming(true)
   }, [uploadedImage])
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user");
+        const data = await res.json();
+        setUser(data);
+      } catch {
+        toast.error("Failed to load user");
+      } finally {
+        setCheckingLimit(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -104,6 +134,31 @@ function AddEffects() {
         window.URL.revokeObjectURL(url);
       })
   };
+
+  if (checkingLimit) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (user) {
+    const plan = user.isSubscribed
+      ? services.elite
+      : services.free;
+
+    if (user.imageCount >= plan.imageLimit) {
+      return (
+        <LimitReached
+          type="image"
+          used={user.imageCount}
+          limit={plan.imageLimit}
+          plan={user.isSubscribed ? "elite" : "free"}
+        />
+      );
+    }
+  }
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">

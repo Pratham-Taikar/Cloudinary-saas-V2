@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CldImage } from "next-cloudinary";
 import toast from "react-hot-toast";
+import LimitReached from "@/components/limitValidator";
+import services from "@/lib/services";
 
 const Filters = {
   none: "none",
@@ -43,6 +45,16 @@ const Effects = {
   negate: "negate",
 };
 
+interface User {
+  userId: string;
+  email: string;
+  username?: string;
+  avatarUrl?: string;
+  imageCount: number;
+  videoCount: number;
+  isSubscribed: boolean;
+}
+
 type EffectFormat = keyof typeof Effects;
 
 function AddEffects() {
@@ -57,6 +69,8 @@ function AddEffects() {
   const imageRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("")
+  const [user, setUser] = useState<User | null>(null);
+  const [checkingLimit, setCheckingLimit] = useState(true);
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
   const MAX_PIXELS = 25_000_000; // 25 Megapixels
@@ -75,6 +89,22 @@ function AddEffects() {
       fileInputRef.current.value = "";
     }
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user");
+        const data = await res.json();
+        setUser(data);
+      } catch {
+        toast.error("Failed to load user");
+      } finally {
+        setCheckingLimit(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -155,6 +185,31 @@ function AddEffects() {
         URL.revokeObjectURL(url);
       });
   };
+
+  if (checkingLimit) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (user) {
+    const plan = user.isSubscribed
+      ? services.elite
+      : services.free;
+
+    if (user.imageCount >= plan.imageLimit) {
+      return (
+        <LimitReached
+          type="image"
+          used={user.imageCount}
+          limit={plan.imageLimit}
+          plan={user.isSubscribed ? "elite" : "free"}
+        />
+      );
+    }
+  }
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">

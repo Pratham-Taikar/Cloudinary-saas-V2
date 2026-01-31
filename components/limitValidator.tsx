@@ -60,7 +60,7 @@ function LimitReached({
         </div>
 
         <div className="space-y-3">
-          <Link href={`/billing?plan=${nextPlan.name.toLowerCase()}`}>
+          <Link href={`/billings`}>
             <button className="btn btn-primary w-full rounded-xl">
               Upgrade to {nextPlan.name}
             </button>

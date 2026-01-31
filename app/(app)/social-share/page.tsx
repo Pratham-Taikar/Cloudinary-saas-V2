@@ -14,6 +14,16 @@ const socialFormats = {
   "Facebook Cover (205:78)": { width: 820, height: 312, aspectRatio: "205:78" },
 };
 
+interface User {
+  userId: string;
+  email: string;
+  username?: string;
+  avatarUrl?: string;
+  imageCount: number;
+  videoCount: number;
+  isSubscribed: boolean;
+}
+
 type SocialFormat = keyof typeof socialFormats;
 
 export default function SocialShare() {
@@ -23,7 +33,7 @@ export default function SocialShare() {
   const [isTransforming, setIsTransforming] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [checkingLimit, setCheckingLimit] = useState(true);
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
