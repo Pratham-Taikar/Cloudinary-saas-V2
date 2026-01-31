@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CldImage } from "next-cloudinary";
 import toast from "react-hot-toast";
 import LimitReached from "@/components/limitValidator";
@@ -20,9 +20,12 @@ function AddEffects() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
-  const imageRef = React.useRef<HTMLImageElement>(null);
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
-  const [fileName, setFileName] = useState("")
+
+  const originalRef = useRef<HTMLImageElement>(null);
+  const transformedRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [fileName, setFileName] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [checkingLimit, setCheckingLimit] = useState(true);
 
@@ -32,10 +35,6 @@ function AddEffects() {
     width: number;
     height: number;
   } | null>(null);
-
-  useEffect(() => {
-    setIsTransforming(true)
-  }, [uploadedImage])
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -61,32 +60,31 @@ function AddEffects() {
 
     setIsUploading(true);
 
-    const name = file.name.slice(0, file.name.lastIndexOf("."))
-    setFileName(name)
+    const name = file.name.slice(0, file.name.lastIndexOf("."));
+    setFileName(name);
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
 
     img.onload = async () => {
-      setImageSize({ width: img.width, height: img.height });
       const width = img.width;
-      const height = img.height
-      const totalPixels = width * height
+      const height = img.height;
+      const totalPixels = width * height;
+
+      setImageSize({ width, height });
       URL.revokeObjectURL(img.src);
 
-      if( totalPixels > MAX_PIXELS ){
+      if (totalPixels > MAX_PIXELS) {
         setIsUploading(false);
-
-        toast.error(`Image resolution too large (${Math.round(totalPixels / 1_000_000)
-          } MP). Please upload an image under 25 MP.`);
+        toast.error(
+          `Image resolution too large (${Math.round(
+            totalPixels / 1_000_000
+          )} MP). Please upload under 25 MP.`
+        );
 
         setFileName("");
         setImageSize(null);
-
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
 
@@ -99,19 +97,14 @@ function AddEffects() {
           body: formData,
         });
 
-        if (!response.ok) {
-          toast.error("Failed to upload image")
-          throw new Error("Failed to upload image")
-        };
+        if (!response.ok) throw new Error("Upload failed");
 
         const data = await response.json();
         setUploadedImage(data.publicId);
-
-        toast.success("Image uploaded")
-
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to upload image")
+        setIsTransforming(true);
+        toast.success("Image uploaded");
+      } catch {
+        toast.error("Failed to upload image");
       } finally {
         setIsUploading(false);
       }
@@ -119,20 +112,20 @@ function AddEffects() {
   };
 
   const handleDownload = () => {
-    if (!imageRef.current) return;
+    if (!transformedRef.current) return;
 
-    fetch(imageRef.current.src)
-      .then((response) => response.blob())
+    fetch(transformedRef.current.src)
+      .then((res) => res.blob())
       .then((blob) => {
-        const url = window.URL.createObjectURL(blob)
+        const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
         link.download = `${fileName}_background-removed.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      })
+        URL.revokeObjectURL(url);
+      });
   };
 
   if (checkingLimit) {
@@ -144,9 +137,7 @@ function AddEffects() {
   }
 
   if (user) {
-    const plan = user.isSubscribed
-      ? services.elite
-      : services.free;
+    const plan = user.isSubscribed ? services.elite : services.free;
 
     if (user.imageCount >= plan.imageLimit) {
       return (
@@ -171,6 +162,7 @@ function AddEffects() {
           <h2 className="card-title mb-4">Upload an Image</h2>
 
           <input
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={handleFileUpload}
@@ -183,50 +175,52 @@ function AddEffects() {
 
           {uploadedImage && imageSize && (
             <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-4">Preview:</h3>
 
-              <div className="mt-6 relative">
-                <h3 className="text-lg font-semibold mb-2">Preview:</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="grid">
-                    <h2>Original: </h2>
-                    <CldImage
-                      ref={imageRef}
-                      src={uploadedImage}
-                      width={imageSize.width}
-                      height={imageSize.height}
-                      crop="fill"
-                      gravity="auto"
-                      quality="auto"
-                      alt="Transformed preview"
-                    />
-                  </div>
-                  <div className="grid">
-                    {isTransforming && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-50 z-10">
-                        <span className="loading loading-spinner loading-lg"></span>
-                      </div>
-                    )}
-                    <h2>Transformed:</h2>
-                    <CldImage
-                      ref={imageRef}
-                      src={uploadedImage}
-                      width={imageSize.width}
-                      height={imageSize.height}
-                      crop="fill"
-                      restore={true}
-                      gravity="auto"
-                      quality="auto"
-                      removeBackground={true}
-                      alt="Transformed preview"
-                      onLoad={() => setIsTransforming(false)}
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="mb-2">Original</h4>
+                  <CldImage
+                    ref={originalRef}
+                    src={uploadedImage}
+                    width={imageSize.width}
+                    height={imageSize.height}
+                    crop="fit"
+                    gravity="auto"
+                    quality="auto"
+                    alt="Original"
+                  />
+                </div>
+
+                <div className="relative">
+                  <h4 className="mb-2">Transformed</h4>
+
+                  {isTransforming && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-base-100/60 z-10">
+                      <span className="loading loading-spinner loading-lg"></span>
+                    </div>
+                  )}
+
+                  <CldImage
+                    ref={transformedRef}
+                    src={uploadedImage}
+                    width={imageSize.width}
+                    height={imageSize.height}
+                    crop="fit"
+                    gravity="auto"
+                    quality="auto"
+                    removeBackground
+                    background="none"
+                    format="png"
+                    alt="Background removed"
+                    onLoad={() => setIsTransforming(false)}
+                  />
                 </div>
               </div>
 
               <div className="card-actions justify-end mt-6">
                 <button className="btn btn-primary" onClick={handleDownload}>
-                  Download
+                  Download PNG
                 </button>
               </div>
             </div>
