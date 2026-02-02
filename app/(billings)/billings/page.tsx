@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import services from "@/lib/services";
 import faqs from "@/lib/faqs";
 
@@ -18,8 +19,15 @@ function BillingPage() {
   return (
     <div className="min-h-screen px-4 py-16 relative">
       <div className="absolute inset-0 -z-10 bg-linear-to-br from-primary/10 via-transparent to-secondary/10" />
-
-      <div className="max-w-6xl mx-auto space-y-16">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="flex justify-start">
+          <Link
+            href="/home"
+            className="btn btn-ghost rounded-xl"
+          >
+            ← Back to Home
+          </Link>
+        </div>
         {/* HEADER */}
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight">

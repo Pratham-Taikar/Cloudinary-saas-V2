@@ -37,7 +37,7 @@ function Dashboard() {
   if (loading) return <div className="text-center">Loading...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
   if (!user) return <div className="text-center">User not found</div>;
-  
+
   const plan = user.isSubscribed ? services.elite : services.free;
 
   const remainingVideos = Math.max(
@@ -50,13 +50,13 @@ function Dashboard() {
     0
   );
 
-  const imagelimitReached = remainingImages === 0 
+  const imagelimitReached = remainingImages === 0
   const videoLimitReached = remainingVideos === 0
 
   return (
     <div className="relative min-h-screen">
       <div className="container mx-auto p-6 max-w-6xl space-y-10">
-        { imagelimitReached && videoLimitReached && (
+        {imagelimitReached && videoLimitReached && (
           <div className="text-center text-red-500 font-semibold text-xl">
             Your plan has reached maximum uploads. Please upgrade to increase upload limit.
           </div>
@@ -94,7 +94,7 @@ function Dashboard() {
             backdrop-blur-xl
             border 
             shadow-lg
-            ${ imagelimitReached && videoLimitReached ? "border-red-500" : "border-white/10"}
+            ${imagelimitReached && videoLimitReached ? "border-red-500" : "border-white/10"}
             `}>
             <h2 className="text-lg font-semibold mb-4">
               Usage Summary
@@ -105,9 +105,9 @@ function Dashboard() {
             <div className="w-full bg-white/10 h-2 rounded mb-4 overflow-hidden">
               <div
                 className={`h-2
-                  ${ videoLimitReached ? "bg-red-500" : "bg-primary" }
+                  ${videoLimitReached ? "bg-red-500" : "bg-primary"}
                   `}
-                style={{
+                style={{ 
                   width: `${Math.min(
                     (user.videoCount / plan.videoLimit) * 100,
                     100
@@ -121,7 +121,7 @@ function Dashboard() {
             <div className="w-full bg-white/10 h-2 rounded overflow-hidden">
               <div
                 className={`h-2
-                  ${ imagelimitReached ? "bg-red-500" : "bg-secondary" }
+                  ${imagelimitReached ? "bg-red-500" : "bg-secondary"}
                   `}
                 style={{
                   width: `${Math.min(
