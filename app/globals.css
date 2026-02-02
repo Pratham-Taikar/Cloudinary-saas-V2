@@ -1,2 +1,33 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@keyframes waveSlow {
+  0% { transform: translateX(0) translateY(0) rotate(0deg); }
+  50% { transform: translateX(5%) translateY(-5%) rotate(10deg); }
+  100% { transform: translateX(0) translateY(0) rotate(0deg); }
+}
+
+@keyframes waveMedium {
+  0% { transform: translateX(0) translateY(0) rotate(0deg); }
+  50% { transform: translateX(-6%) translateY(6%) rotate(-12deg); }
+  100% { transform: translateX(0) translateY(0) rotate(0deg); }
+}
+
+@keyframes waveFast {
+  0% { transform: translateX(0) translateY(0) rotate(0deg); }
+  50% { transform: translateX(8%) translateY(8%) rotate(15deg); }
+  100% { transform: translateX(0) translateY(0) rotate(0deg); }
+}
+
+.animate-wave-slow {
+  animation: waveSlow 18s ease-in-out infinite;
+}
+
+.animate-wave-medium {
+  animation: waveMedium 14s ease-in-out infinite;
+}
+
+.animate-wave-fast {
+  animation: waveFast 10s ease-in-out infinite;
+}
+

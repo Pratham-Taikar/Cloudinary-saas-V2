@@ -11,12 +11,6 @@ const services = {
     imageLimit: 75,
     price: 149,
   },
-  Mega: {
-    name: "Mega",
-    videoLimit: 100,
-    imageLimit: 400,
-    price: 599,
-  }
 }
 
 export default services;

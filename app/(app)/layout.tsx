@@ -136,7 +136,7 @@ export default function AppLayout({
               <div>
                 <Link
                 href={"/user-dashboard"}
-                  className={`flex items-center space-x-4 mb-2  border-2 border-base-200 px-4 py-2 rounded-lg 
+                  className={`flex items-center space-x-4 mb-2 border-2 border-base-200 px-4 py-2 rounded-lg 
                     ${pathname === "/user-dashboard"
                       ? "bg-primary text-white"
                       : "hover:bg-base-300"
@@ -144,7 +144,7 @@ export default function AppLayout({
                   onClick={() => setSidebarOpen(false)}
                 >
                   <UserCog className="w-6 h-6" />
-                  <span>Dashboard</span>
+                  <span className="text-sm">Dashboard</span>
                 </Link>
               </div>
               <button
