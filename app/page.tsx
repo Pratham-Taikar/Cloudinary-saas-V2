@@ -37,7 +37,7 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
 
       <div className="absolute inset-0 bg-black/60 backdrop-blur-2xl z-30" />
 
-      <div className="relative z-40 text-4xl tracking-[0.35em] font-semibold">
+      <div className="relative z-40 text-lg sm:text-4xl tracking-[0.35em] font-semibold">
         {text.slice(0, visibleLetters)}
       </div>
     </div>
@@ -80,23 +80,11 @@ export default function LandingPage() {
           </div>
 
           <Link
-            href={"/"}
-            className="hidden sm:inline-flex btn btn-outline btn-sm rounded-xl px-5"
+            href={"/info"}
+            className="sm:inline-flex btn btn-outline btn-sm rounded-xl px-5"
           >
             What’s more
           </Link>
-
-          <button
-            type="button"
-            className="sm:hidden btn btn-outline btn-sm rounded-lg px-4"
-            onClick={() =>
-              document
-                .getElementById("features")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-          >
-            What's More
-          </button>
 
         </div>
       </header>
@@ -104,26 +92,29 @@ export default function LandingPage() {
 
       {/* ================= HERO ================= */}
       <section className="max-w-6xl mx-auto px-6 pt-24 pb-20 text-center">
-        <h1 className="text-5xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-5xl font-bold tracking-tight">
           Simple. Powerful. Media Processing.
         </h1>
 
-        <p className="mt-6 text-lg opacity-75 max-w-3xl mx-auto">
+        <p className="mt-6 text-sm sm:text-lg opacity-75 max-w-3xl mx-auto">
           A modern SaaS platform to transform images and videos instantly.
           No clutter. No storage overhead. Just fast, reliable processing
           built for creators, developers, and teams.
         </p>
 
         <div className="mt-10 flex justify-center gap-4">
-          <Link href="/sign-in" className="btn btn-primary rounded-xl px-8">
+          <Link href="/sign-in" className="btn btn-primary rounded-xl px-4 sm:px-8">
             Get Started
           </Link>
-          <Link href="/billing" className="btn btn-outline rounded-xl px-8">
+          <Link href="/billing" className="btn btn-outline rounded-xl px-4 sm:px-8">
             View Pricing
           </Link>
         </div>
 
-        <p className="mt-8 text-sm opacity-60">
+        <p className="mt-8 inline-block px-5 py-2 text-xs sm:text-sm 
+text-white/80 bg-white/10 dark:bg-black/20 
+backdrop-blur-xl border border-white/20 
+rounded-full shadow-sm">
           Fast and predictable media workflows
         </p>
       </section>
@@ -131,8 +122,8 @@ export default function LandingPage() {
       {/* ================= WHAT IT DOES ================= */}
       <section className="max-w-6xl mx-auto px-6 py-24 space-y-16">
         <div className="text-center">
-          <h2 className="text-3xl font-bold">What this platform does</h2>
-          <p className="mt-4 text-base opacity-70 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold">What this platform does</h2>
+          <p className="mt-4 text-sm sm:text-lg opacity-70 max-w-2xl mx-auto">
             The platform focuses on real-time media transformations —
             helping you prepare images and videos exactly how you need them,
             without storing unnecessary assets.
@@ -170,13 +161,13 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center
         bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 p-8 rounded-xl">
           <div>
-            <h2 className="text-4xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-4xl font-bold mb-6">
               Effects over Images
             </h2>
-            <p className="text-base opacity-75 leading-relaxed mb-4">
+            <p className="text-sm sm:text-base opacity-75 leading-relaxed mb-4">
               Add effects to images, get them modified with multiple effects and filters provided.
             </p>
-            <p className="text-base opacity-75 leading-relaxed">
+            <p className="text-sm sm:text-base opacity-75 leading-relaxed">
               Just upload and get results.
             </p>
           </div>
@@ -221,38 +212,42 @@ export default function LandingPage() {
           </div>
 
           <div className="order-1 md:order-2">
-            <h2 className="text-4xl text-right font-bold mb-6">
+            <h2 className="text-2xl sm:text-4xl text-right font-bold mb-6">
               Background Removal 
             </h2>
-            <p className="text-base opacity-75 text-right leading-relaxed mb-4">
+            <p className="text-sm sm:text-base opacity-75 text-right leading-relaxed mb-4">
               Generate clean, and clear background removed images.
             </p>
-            <p className="text-base opacity-75 text-right leading-relaxed">
+            <p className="text-sm sm:text-base opacity-75 text-right leading-relaxed">
               Perfect for product photos, profile images, and marketing assets.
             </p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center
-        bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 p-6 rounded-xl">
-          <div>
-            <h2 className="text-4xl font-bold mb-6">
-              Video Compressions 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center
+bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 
+p-4 sm:p-6 lg:p-10 rounded-xl">
+
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
+              Video Compression
             </h2>
-            <p className="text-base opacity-75 leading-relaxed mb-4">
-              Helps in decreasing video size just by uploading. Get On-the-go video compression.
+
+            <p className="text-sm sm:text-base opacity-80 leading-relaxed mb-3 sm:mb-4 max-w-xl mx-auto md:mx-0">
+              Helps in decreasing video size just by uploading. Get on-the-go video compression.
             </p>
-            <p className="text-base opacity-75 leading-relaxed">
-              video compressing smartly based on the video.
+
+            <p className="text-sm sm:text-base opacity-80 leading-relaxed max-w-xl mx-auto md:mx-0">
+              Video compressing smartly based on the content and quality.
             </p>
           </div>
 
           <div className="w-full flex justify-center">
-            <div className="w-100 overflow-hidden rounded-xl">
+            <div className="w-full sm:w-[80%] md:w-full max-w-md overflow-hidden rounded-xl">
               <img
                 src="/video.png"
                 alt="Video compression"
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-cover"
               />
             </div>
           </div>
@@ -378,10 +373,10 @@ export default function LandingPage() {
 
       {/* ================= FINAL CTA ================= */}
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
-        <h2 className="text-4xl font-bold">
+        <h2 className="text-2xl sm:text-4xl font-bold">
           Start transforming today
         </h2>
-        <p className="mt-4 text-base opacity-70 max-w-xl mx-auto">
+        <p className="mt-4 text-sm sm:text-base opacity-70 max-w-xl mx-auto">
           Whether you’re preparing assets for social media, applications,
           or internal tools — EasyUploads stays fast, simple, and reliable.
         </p>
@@ -393,12 +388,28 @@ export default function LandingPage() {
           Go to Dashboard
         </Link>
         <div>
-          <h1 className="text-base opacity-70 py-2 mt-12 border border-white/40 rounded-lg">
+          <h1 className="text-sm px-2 sm:text-base opacity-70 py-2 mt-12 border border-white/40 rounded-lg">
             <span className="text-red-500 font-semibold">NOTE: </span>
             This Platform is developed with limited features. More features can be introduced in future..<br></br>
-          We will notify you in such case.</h1>
+          We will notify you in such case.
+          </h1>
         </div>
       </section>
+
+      <footer className="w-full mt-20 border-t border-white/10 bg-white/5 dark:bg-black/20 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-white/70 text-center md:text-left">
+              © {new Date().getFullYear()} Pratham. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6 text-sm text-white/70">
+              <a href="/contact" className="hover:text-white transition">
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

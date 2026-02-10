@@ -68,7 +68,7 @@ export default function AppLayout({
             </div>
             <div className="flex-1">
               <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-2xl font-bold tracking-tight cursor-pointer">
+                <div className="btn btn-ghost normal-case text-xl sm:text-2xl font-bold tracking-tight cursor-pointer">
                   EasyUploads
                 </div>
               </Link>
@@ -86,9 +86,6 @@ export default function AppLayout({
                       />
                     </div>
                   </div>
-                  <span className="text-sm truncate max-w-xs lg:max-w-md">
-                    {user.username || user.emailAddresses[0].emailAddress}
-                  </span>
                   <button
                     onClick={handleSignOut}
                     className="btn btn-ghost btn-circle hover:border-2 hover:border-blue-800"
