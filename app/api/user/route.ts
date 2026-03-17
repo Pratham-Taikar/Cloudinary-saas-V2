@@ -27,7 +27,7 @@ export async function GET() {
         avatarUrl: clerkUser.imageUrl,
         imageCount: 0,
         videoCount: 0,
-        isSubscribed: false,
+        plan: "free",
       });
     }
 

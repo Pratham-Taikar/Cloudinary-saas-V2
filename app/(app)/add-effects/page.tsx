@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { CldImage } from "next-cloudinary";
 import toast from "react-hot-toast";
 import LimitReached from "@/components/limitValidator";
-import services from "@/lib/services";
+import services, { type PlanKey } from "@/lib/services";
 
 const Filters = {
   none: "none",
@@ -52,7 +52,7 @@ interface User {
   avatarUrl?: string;
   imageCount: number;
   videoCount: number;
-  isSubscribed: boolean;
+  plan: PlanKey;
 }
 
 type EffectFormat = keyof typeof Effects;
@@ -195,9 +195,7 @@ function AddEffects() {
   }
 
   if (user) {
-    const plan = user.isSubscribed
-      ? services.elite
-      : services.free;
+    const plan = services[user.plan] || services.free;
 
     if (user.imageCount >= plan.imageLimit) {
       return (
@@ -205,7 +203,7 @@ function AddEffects() {
           type="image"
           used={user.imageCount}
           limit={plan.imageLimit}
-          plan={user.isSubscribed ? "elite" : "free"}
+          plan={user.plan}
         />
       );
     }

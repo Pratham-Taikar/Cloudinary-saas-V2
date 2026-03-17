@@ -19,8 +19,6 @@ interface CloudinaryUploadResult{
   [key: number] : any
 }
 
-const MAX_FREE_VIDEOS = 5;
-
 export async function POST( request: NextRequest ){
  
   try {
@@ -42,9 +40,9 @@ export async function POST( request: NextRequest ){
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const plan = user.isSubscribed ? services.elite : services.free;
+    const plan = services[user.plan] || services.free;
 
-    if (!user.isSubscribed && user.videoCount >= plan.videoLimit) {
+    if (user.videoCount >= plan.videoLimit) {
       return NextResponse.json(
         { error: "Video limit reached. Upgrade required." },
         { status: 403 }

@@ -3,14 +3,29 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import services from "@/lib/services";
+import services, { planOrder, type PlanKey } from "@/lib/services";
 import faqs from "@/lib/faqs";
+
+const planMeta: Record<PlanKey, { tagline: string; features: string[]; badge?: string }> = {
+  free: {
+    tagline: "Get started for free",
+    features: ["Standard processing"],
+  },
+  elite: {
+    tagline: "Best for creators & power users",
+    badge: "Most Popular",
+    features: ["High-quality optimization", "Priority processing"],
+  },
+  mega: {
+    tagline: "For teams & heavy workloads",
+    badge: "Best Value",
+    features: ["Ultra-high-quality optimization", "Priority processing", "Premium support"],
+  },
+};
 
 function BillingPage() {
   const router = useRouter();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const { free, elite } = services;
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -39,60 +54,62 @@ function BillingPage() {
         </div>
 
         {/* PRICING */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* FREE */}
-          <div className="rounded-2xl p-8 bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 shadow-lg">
-            <h2 className="text-2xl font-semibold">{free.name}</h2>
-            <p className="text-sm opacity-70 mb-6">Get started for free</p>
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-8">
+          {planOrder.map((key) => {
+            const plan = services[key];
+            const meta = planMeta[key];
+            const isFree = key === "free";
+            const hasBadge = !!meta.badge;
 
-            <p className="text-3xl font-bold mb-6">
-              ₹{free.price}
-              <span className="text-sm opacity-70"> /month</span>
-            </p>
+            return (
+              <div
+                key={key}
+                className={`relative rounded-2xl p-8 backdrop-blur-xl shadow-lg ${
+                  hasBadge
+                    ? "bg-white/20 dark:bg-black/30 border border-primary/40 shadow-xl"
+                    : "bg-white/10 dark:bg-black/20 border border-white/10"
+                }`}
+              >
+                {hasBadge && (
+                  <span className="absolute -top-3 right-4 px-3 py-1 bg-primary text-primary-content text-xs font-semibold rounded-full">
+                    {meta.badge}
+                  </span>
+                )}
 
-            <ul className="space-y-3 text-sm">
-              <li>✔ {free.videoLimit} video uploads</li>
-              <li>✔ {free.imageLimit} image transformations</li>
-              <li>✔ Standard processing</li>
-            </ul>
+                <h2 className="text-2xl font-semibold">{plan.name}</h2>
+                <p className="text-sm opacity-70 mb-6">{meta.tagline}</p>
 
-            <button
-              disabled
-              className="btn btn-outline w-full mt-8 cursor-not-allowed"
-            >
-              Current Plan
-            </button>
-          </div>
+                <p className="text-3xl font-bold mb-6">
+                  ₹{plan.price}
+                  <span className="text-sm opacity-70"> /month</span>
+                </p>
 
-          {/* ELITE (Most Popular) */}
-          <div className="relative rounded-2xl p-8 bg-white/20 dark:bg-black/30 backdrop-blur-xl border border-primary/40 shadow-xl">
-            <span className="absolute -top-3 right-4 px-3 py-1 bg-primary text-primary-content text-xs font-semibold rounded-full">
-              Most Popular
-            </span>
+                <ul className="space-y-3 text-sm">
+                  <li>✔ {plan.videoLimit} video uploads</li>
+                  <li>✔ {plan.imageLimit} image transformations</li>
+                  {meta.features.map((f, i) => (
+                    <li key={i}>✔ {f}</li>
+                  ))}
+                </ul>
 
-            <h2 className="text-2xl font-semibold">{elite.name}</h2>
-            <p className="text-sm opacity-70 mb-6">
-              Best for creators & power users
-            </p>
-
-            <p className="text-3xl font-bold mb-6">
-              ₹{elite.price}
-              <span className="text-sm opacity-70"> /month</span>
-            </p>
-
-            <ul className="space-y-3 text-sm">
-              <li>✔ {elite.videoLimit} video uploads</li>
-              <li>✔ {elite.imageLimit} image transformations</li>
-              <li>✔ High-quality optimization</li>
-            </ul>
-
-            <button
-              className="btn btn-primary w-full mt-8 rounded-xl"
-              onClick={() => router.push("/checkout?plan=elite")}
-            >
-              Upgrade to Elite
-            </button>
-          </div>
+                {isFree ? (
+                  <button
+                    disabled
+                    className="btn btn-outline w-full mt-8 cursor-not-allowed"
+                  >
+                    Current Plan
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-primary w-full mt-8 rounded-xl"
+                    onClick={() => router.push(`/checkout?plan=${key}`)}
+                  >
+                    Upgrade to {plan.name}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* FAQ */}

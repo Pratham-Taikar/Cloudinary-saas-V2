@@ -213,7 +213,7 @@ rounded-full shadow-sm">
 
           <div className="order-1 md:order-2">
             <h2 className="text-2xl sm:text-4xl text-right font-bold mb-6">
-              Background Removal 
+              Background Removal
             </h2>
             <p className="text-sm sm:text-base opacity-75 text-right leading-relaxed mb-4">
               Generate clean, and clear background removed images.
@@ -391,7 +391,7 @@ p-4 sm:p-6 lg:p-10 rounded-xl">
           <h1 className="text-sm px-2 sm:text-base opacity-70 py-2 mt-12 border border-white/40 rounded-lg">
             <span className="text-red-500 font-semibold">NOTE: </span>
             This Platform is developed with limited features. More features can be introduced in future..<br></br>
-          We will notify you in such case.
+            We will notify you in such case.
           </h1>
         </div>
       </section>

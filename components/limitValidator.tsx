@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import services from "@/lib/services";
+import services, { getNextPlan, type PlanKey } from "@/lib/services";
 
 interface LimitReachedProps {
   type: "image" | "video";
   used: number;
   limit: number;
-  plan: keyof typeof services; // "free" | "elite"
+  plan: PlanKey;
 }
 
 function LimitReached({
@@ -17,9 +17,8 @@ function LimitReached({
   plan,
 }: LimitReachedProps) {
   const currentPlan = services[plan];
-
-  // Only two plans: free → elite
-  const nextPlan = plan === "free" ? services.elite : null;
+  const nextPlanKey = getNextPlan(plan);
+  const nextPlan = nextPlanKey ? services[nextPlanKey] : null;
 
   const label =
     type === "image" ? "Image uploads" : "Video uploads";
@@ -38,7 +37,7 @@ function LimitReached({
         </h1>
 
         <p className="text-sm opacity-80">
-          You’ve reached the maximum number of{" "}
+          You've reached the maximum number of{" "}
           <span className="font-semibold">{label}</span> allowed
           on the{" "}
           <span className="font-semibold">{currentPlan.name}</span>{" "}
@@ -66,9 +65,9 @@ function LimitReached({
         {/* CTA Section */}
         <div className="space-y-3">
           {nextPlan ? (
-            <Link href="/billing">
+            <Link href="/billings">
               <button className="btn btn-primary w-full rounded-xl">
-                Upgrade to {nextPlan.name}
+                Upgrade to {nextPlan.name} — ₹{nextPlan.price}/mo
               </button>
             </Link>
           ) : (

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import type { PlanKey } from "@/lib/services";
 
 export interface IUser extends Document {
   userId: string;
@@ -7,7 +8,7 @@ export interface IUser extends Document {
   avatarUrl?: string;
   imageCount: number;
   videoCount: number;
-  isSubscribed: boolean;
+  plan: PlanKey;
 }
 
 const userSchema: Schema<IUser> = new Schema(
@@ -34,9 +35,10 @@ const userSchema: Schema<IUser> = new Schema(
       type: Number,
       default: 0,
     },
-    isSubscribed: {
-      type: Boolean,
-      default: false,
+    plan: {
+      type: String,
+      enum: ["free", "elite", "mega"],
+      default: "free",
     },
   },
   { timestamps: true }

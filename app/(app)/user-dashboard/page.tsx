@@ -3,7 +3,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import services from "@/lib/services";
+import services, { getNextPlan, type PlanKey } from "@/lib/services";
 
 interface User {
   userId: string;
@@ -12,7 +12,7 @@ interface User {
   avatarUrl?: string;
   imageCount: number;
   videoCount: number;
-  isSubscribed: boolean;
+  plan: PlanKey;
 }
 
 function Dashboard() {
@@ -48,7 +48,9 @@ function Dashboard() {
   if (!user)
     return <div className="text-center">User not found</div>;
 
-  const plan = user.isSubscribed ? services.elite : services.free;
+  const plan = services[user.plan] || services.free;
+  const nextPlanKey = getNextPlan(user.plan);
+  const nextPlan = nextPlanKey ? services[nextPlanKey] : null;
 
   const remainingVideos = Math.max(
     plan.videoLimit - user.videoCount,
@@ -173,10 +175,10 @@ function Dashboard() {
               </p>
             </div>
 
-            {!user.isSubscribed && (
+            {nextPlan && (
               <Link href="/billings">
                 <button className="btn btn-primary mt-6 w-full rounded-xl">
-                  Upgrade to {services.elite.name}
+                  Upgrade to {nextPlan.name}
                 </button>
               </Link>
             )}

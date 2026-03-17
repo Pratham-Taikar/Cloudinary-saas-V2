@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        const plan = user.isSubscribed ? services.elite : services.free;
+        const plan = services[user.plan] || services.free;
 
-        if (!user.isSubscribed && user.imageCount >= plan.imageLimit) {
+        if (user.imageCount >= plan.imageLimit) {
             return NextResponse.json(
                 { error: "Image limit reached. Upgrade required." },
                 { status: 403 }

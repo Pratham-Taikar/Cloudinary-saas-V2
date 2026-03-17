@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { CldImage } from 'next-cloudinary';
 import toast from 'react-hot-toast';
-import services from '@/lib/services';
+import services, { type PlanKey } from '@/lib/services';
 import LimitReached from '@/components/limitValidator';
 
 const socialFormats = {
@@ -21,7 +21,7 @@ interface User {
   avatarUrl?: string;
   imageCount: number;
   videoCount: number;
-  isSubscribed: boolean;
+  plan: PlanKey;
 }
 
 type SocialFormat = keyof typeof socialFormats;
@@ -147,7 +147,6 @@ export default function SocialShare() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        document.body.removeChild(link);
       })
   }
 
@@ -160,9 +159,7 @@ export default function SocialShare() {
   }
 
   if (user) {
-    const plan = user.isSubscribed
-      ? services.elite
-      : services.free;
+    const plan = services[user.plan] || services.free;
 
     if (user.imageCount >= plan.imageLimit) {
       return (
@@ -170,7 +167,7 @@ export default function SocialShare() {
           type="image"
           used={user.imageCount}
           limit={plan.imageLimit}
-          plan={user.isSubscribed ? "elite" : "free"}
+          plan={user.plan}
         />
       );
     }

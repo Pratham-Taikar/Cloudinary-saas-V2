@@ -5,7 +5,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import LimitReached from "@/components/limitValidator";
-import services from "@/lib/services";
+import services, { type PlanKey } from "@/lib/services";
 
 interface User {
   userId: string;
@@ -14,7 +14,7 @@ interface User {
   avatarUrl?: string;
   imageCount: number;
   videoCount: number;
-  isSubscribed: boolean;
+  plan: PlanKey;
 }
 
 function VideoUpload() {
@@ -115,9 +115,7 @@ function VideoUpload() {
   }
 
   if (user) {
-    const plan = user.isSubscribed
-      ? services.elite
-      : services.free;
+    const plan = services[user.plan] || services.free;
 
     if (user.videoCount >= plan.videoLimit) {
       return (
@@ -125,7 +123,7 @@ function VideoUpload() {
           type="video"
           used={user.videoCount}
           limit={plan.videoLimit}
-          plan={user.isSubscribed ? "elite" : "free"}
+          plan={user.plan}
         />
       );
     }
