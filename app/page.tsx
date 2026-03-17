@@ -64,56 +64,43 @@ export default function LandingPage() {
       <div className="absolute inset-0 -z-10 bg-linear-to-br from-primary/10 via-transparent to-secondary/10" />
 
       {/* ================= HEADER ================= */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/5 dark:bg-black/20 border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="/saaslogo.png"
-              alt="EasyUploads Logo"
-              width={150}
-              height={100}
-              className="shrink-0"
-            />
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-black/40 border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
+          <img src="/saaslogo.png" alt="weblogo" className="sm:w-50 w-36" />
+
+          <div className="flex gap-3">
+            <Link href="/billings" className="btn btn-outline btn-sm">
+              Pricing
+            </Link>
+            <Link href="/info" className="btn btn-primary btn-sm">
+              Capabilities
+            </Link>
           </div>
-
-          <Link
-            href={"/info"}
-            className="sm:inline-flex btn btn-outline btn-sm rounded-xl px-5"
-          >
-            What’s more
-          </Link>
-
         </div>
       </header>
 
 
       {/* ================= HERO ================= */}
       <section className="max-w-6xl mx-auto px-6 pt-24 pb-20 text-center">
-        <h1 className="text-2xl sm:text-5xl font-bold tracking-tight">
-          Simple. Powerful. Media Processing.
+
+        <h1 className="text-4xl sm:text-6xl font-extrabold leading-tight">
+          Transform Images & Videos <br />
+          <span className="text-primary">Instantly. At Scale.</span>
         </h1>
 
         <p className="mt-6 text-sm sm:text-lg opacity-75 max-w-3xl mx-auto">
           A modern SaaS platform to transform images and videos instantly.
           No clutter. No storage overhead. Just fast, reliable processing
-          built for creators, developers, and teams.
         </p>
 
         <div className="mt-10 flex justify-center gap-4">
-          <Link href="/sign-in" className="btn btn-primary rounded-xl px-4 sm:px-8">
-            Get Started
+          <Link href="/sign-in" className="btn btn-primary px-8">
+            Start for Free
           </Link>
-          <Link href="/billing" className="btn btn-outline rounded-xl px-4 sm:px-8">
+          <Link href="/billings" className="btn btn-outline px-8">
             View Pricing
           </Link>
         </div>
-
-        <p className="mt-8 inline-block px-5 py-2 text-xs sm:text-sm 
-text-white/80 bg-white/10 dark:bg-black/20 
-backdrop-blur-xl border border-white/20 
-rounded-full shadow-sm">
-          Fast and predictable media workflows
-        </p>
       </section>
 
       {/* ================= WHAT IT DOES ================= */}
@@ -130,24 +117,36 @@ rounded-full shadow-sm">
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              title: "Image Transformations",
-              desc: "Resize, crop, optimize, remove backgrounds, and more such image transformations.",
+              title: "Background Removal",
+              desc: "AI-powered subject separation with pixel-level accuracy.",
             },
             {
-              title: "Video Optimization",
-              desc: "Upload and compress videos with smart quality presets optimized for speed and compatibility.",
+              title: "Image Filters",
+              desc: "Professional filters, contrast, sharpen, and more.",
             },
             {
-              title: "On-demand Processing",
-              desc: "Assets are processed only when required — no persistent storage, no clutter.",
+              title: "Resize & Optimize",
+              desc: "Smart resizing with WebP & AVIF optimization.",
             },
-          ].map((item, i) => (
+            {
+              title: "Video Compression",
+              desc: "Reduce size up to 80% without quality loss.",
+            },
+            {
+              title: "On-Demand Processing",
+              desc: "No storage — process only when needed.",
+            },
+            {
+              title: "Generate Background Using Creativity",
+              desc: "Prompt based generative AI background",
+            },
+          ].map((f, i) => (
             <div
               key={i}
-              className="rounded-2xl p-6 bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 shadow-lg"
+              className="p-6 rounded-xl bg-white/5 border border-white/10"
             >
-              <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-              <p className="text-sm opacity-75">{item.desc}</p>
+              <h3 className="font-semibold mb-2">{f.title}</h3>
+              <p className="text-sm text-white/70">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -172,7 +171,7 @@ rounded-full shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-xl overflow-hidden">
               <img
-                src="/original.png"
+                src="/effect_original.png"
                 alt="Original"
                 className="w-full h-full object-cover"
               />
@@ -180,7 +179,7 @@ rounded-full shadow-sm">
 
             <div className="rounded-xl overflow-hidden">
               <img
-                src="/tranformed.png"
+                src="/effect_transformed.png"
                 alt="Transformed"
                 className="w-full h-full object-cover"
               />
@@ -193,16 +192,16 @@ rounded-full shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-xl overflow-hidden">
               <img
-                src="/dog.jpg"
-                alt="Original dog"
+                src="/background_original.png"
+                alt="Original"
                 className="w-full h-full object-cover"
               />
             </div>
 
             <div className="rounded-xl overflow-hidden">
               <img
-                src="/dog-bg-remove.png"
-                alt="Background removed"
+                src="/background_removed.png"
+                alt="Background Removed"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -221,11 +220,55 @@ rounded-full shadow-sm">
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center
-bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 
-p-4 sm:p-6 lg:p-10 rounded-xl">
+        <div className="grid md:grid-cols-2 gap-12 items-center
+        bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 p-8 rounded-xl">
+          <div>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-6">
+              Generative Background
+            </h2>
+            <p className="text-sm sm:text-base opacity-75 leading-relaxed mb-4">
+              Use your creativity to generate background with prompting.
+            </p>
+            <p className="text-sm sm:text-base opacity-75 leading-relaxed">
+              Different prompts, different results.
+            </p>
+            <p className="sm:mt-4 sm:border sm:w-fit sm:px-4 sm:py-2 sm:border-yellow-600 sm:text-white sm:rounded-full font-semibold text-yellow-600 sm:text-base text-sm mt-2">
+              Prompt: Grassland and tree with yellow leaves.
+            </p>
+          </div>
 
-          <div className="text-center md:text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-xl overflow-hidden">
+              <img
+                src="/ai_original.png"
+                alt="Original"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="rounded-xl overflow-hidden">
+              <img
+                src="/ai_tranformedpng.png"
+                alt="Transformed"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10 p-8 sm:p-6 lg:p-10 rounded-xl">
+
+          <div className="w-full flex justify-center">
+            <div className="w-full sm:w-[80%] md:w-full max-w-md overflow-hidden rounded-xl">
+              <img
+                src="https://aicdn.picsart.com/766a2cc1-e87a-4fbd-a3a6-6ac843813705.png"
+                alt="Video compression"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="text-left">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
               Video Compression
             </h2>
@@ -237,16 +280,6 @@ p-4 sm:p-6 lg:p-10 rounded-xl">
             <p className="text-sm sm:text-base opacity-80 leading-relaxed max-w-xl mx-auto md:mx-0">
               Video compressing smartly based on the content and quality.
             </p>
-          </div>
-
-          <div className="w-full flex justify-center">
-            <div className="w-full sm:w-[80%] md:w-full max-w-md overflow-hidden rounded-xl">
-              <img
-                src="/video.png"
-                alt="Video compression"
-                className="w-full h-auto object-cover"
-              />
-            </div>
           </div>
         </div>
       </section>
@@ -290,93 +323,13 @@ p-4 sm:p-6 lg:p-10 rounded-xl">
         </div>
       </section>
 
-      {/* ================= WHY THIS ARCHITECTURE ================= */}
-      <section className="max-w-6xl mx-auto px-6 py-24 space-y-10">
-        <h2 className="text-3xl font-bold text-center">
-          Built for performance and clarity
-        </h2>
-
-        <p className="text-base opacity-75 max-w-3xl mx-auto text-center">
-          This platform is not a media storage system. It is a fast,
-          stateless processing engine designed to keep costs low,
-          performance high, and workflows predictable.
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {[
-            "No unnecessary media storage",
-            "Scales efficiently with demand",
-            "Lower infrastructure overhead",
-            "Cleaner, focused user experience",
-          ].map((point, i) => (
-            <div
-              key={i}
-              className="rounded-xl p-5 bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/10"
-            >
-              <p className="text-sm opacity-80">• {point}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ================= PRICING PREVIEW ================= */}
-      <section className="max-w-6xl mx-auto px-6 py-24 text-center">
-        <h2 className="text-3xl font-bold mb-6">
-          Simple Pricing. Effective Pricing
-        </h2>
-        <p className="text-base opacity-70 mb-12">
-          Start free. Upgrade only when you need more.
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {Object.values(services).map((plan, i) => (
-            <div
-              key={i}
-              className="group relative overflow-hidden rounded-2xl p-8
-        bg-white/10 dark:bg-black/20
-        backdrop-blur-xl
-        border border-white/10
-        shadow-lg
-        transition-transform duration-300
-        hover:-translate-y-1"
-            >
-              <span
-                className="pointer-events-none absolute inset-0
-          -translate-x-full
-          bg-linear-to-r from-transparent via-white/30 to-transparent
-          opacity-0
-          transition-all duration-700
-          group-hover:translate-x-full
-          group-hover:opacity-100"
-              />
-
-              <h3 className="text-xl font-semibold mb-2 text-blue-800 relative z-10">
-                {plan.name}
-              </h3>
-
-              <p className="text-3xl font-bold mb-4 relative z-10">
-                ₹{plan.price}
-                <span className="text-sm opacity-70"> /month</span>
-              </p>
-
-              <p className="text-sm opacity-70 relative z-10">
-                {plan.videoLimit} video uploads <br />
-                {plan.imageLimit} image transformations
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ================= FINAL CTA ================= */}
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold">
-          Start transforming today
-        </h2>
-        <p className="mt-4 text-sm sm:text-base opacity-70 max-w-xl mx-auto">
-          Whether you’re preparing assets for social media, applications,
-          or internal tools — EasyUploads stays fast, simple, and reliable.
-        </p>
+        <h1 className="text-4xl sm:text-6xl font-extrabold leading-tight">
+          Start 
+          <span className="text-primary"> Transforming </span> 
+          Today
+        </h1>
 
         <Link
           href="/sign-in"
@@ -384,13 +337,6 @@ p-4 sm:p-6 lg:p-10 rounded-xl">
         >
           Go to Dashboard
         </Link>
-        <div>
-          <h1 className="text-sm px-2 sm:text-base opacity-70 py-2 mt-12 border border-white/40 rounded-lg">
-            <span className="text-red-500 font-semibold">NOTE: </span>
-            This Platform is developed with limited features. More features can be introduced in future..<br></br>
-            We will notify you in such case.
-          </h1>
-        </div>
       </section>
 
       <footer className="w-full mt-20 border-t border-white/10 bg-white/5 dark:bg-black/20 backdrop-blur-xl">
@@ -402,6 +348,9 @@ p-4 sm:p-6 lg:p-10 rounded-xl">
             <div className="flex items-center gap-6 text-sm text-white/70">
               <a href="/contact" className="hover:text-white transition">
                 Contact
+              </a>
+              <a href="/docs" className="hover:text-white transition">
+                Docs
               </a>
             </div>
           </div>

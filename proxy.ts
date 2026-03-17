@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher([
   "/sign-in",
   "/sign-up",
+  "/billings",
+  "/contact",
   "/",
   "/info",
   "/home",
@@ -20,6 +22,12 @@ export default clerkMiddleware(async (auth, req) => {
   if (userId && isPublicRoute(req) && !isAccessingDashboard) {
     return NextResponse.redirect(new URL("/home", req.url));
   }
+
+  const currPath = currentUrl.pathname;
+  if( !userId && (currPath.startsWith("/home"))){
+    return NextResponse.redirect(new URL("/sign-in", req.url));
+  }
+
   //not logged in
   if (!userId) {
     // If user is not logged in and trying to access a protected route
