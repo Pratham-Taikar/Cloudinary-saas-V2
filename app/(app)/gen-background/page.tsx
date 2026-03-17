@@ -271,17 +271,20 @@ function GenerateBackground() {
                     <div className="grid">
                       <h2 className="font-semibold">Transformed:</h2>
                       <CldImage
+                        key={transformKey}
+                        ref={imageRef}
                         src={uploadedImage}
                         width={Math.min(imageSize.width, 2048)}
                         height={Math.min(imageSize.height, 2048)}
                         crop="limit"
                         gravity="auto"
                         quality="auto"
-                        removeBackground
-                        restore
-                        background="transparent"
-                        format="png"
+                        replaceBackground={{
+                          prompt: `${backgroundEffect}`
+                        }}
+                        restore={true}
                         alt="Generated image"
+                        onLoad={() => setIsTransforming(false)}
                       />
                     </div>
                   </div>
