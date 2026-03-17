@@ -255,7 +255,7 @@ function BillingPage() {
           </div>
           <div className="flex items-center gap-2 text-sm opacity-70">
             <Users className="w-4 h-4" />
-            10,000+ users trust us
+            Multiple user plans
           </div>
         </motion.div>
 
