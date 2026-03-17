@@ -67,11 +67,9 @@ export default function AppLayout({
               </label>
             </div>
             <div className="flex-1">
-              <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-xl sm:text-2xl font-bold tracking-tight cursor-pointer">
-                  EasyUploads
+                <div className="normal-case text-xl sm:text-2xl font-bold text-gray-400 tracking-tight cursor-pointer">
+                  Your Media, Simplified.
                 </div>
-              </Link>
             </div>
             <div className="flex-none flex items-center space-x-4">
               {user && (
@@ -108,7 +106,7 @@ export default function AppLayout({
         <label htmlFor="sidebar-drawer" className="drawer-overlay"></label>
         <aside className="bg-base-200 w-64 h-full flex flex-col">
           <div className="flex items-center justify-center py-4">
-            <img src="/weblogo-removebg-preview.png" alt="web-logo" width={125} onClick={handleLogoClick} className="hover:cursor-pointer"/>
+            <img src="/saaslogo.png" alt="web-logo" width={200} onClick={handleLogoClick} className="hover:cursor-pointer"/>
           </div>
           <ul className="menu p-4 w-full text-base-content grow">
             {sidebarItems.map((item) => (

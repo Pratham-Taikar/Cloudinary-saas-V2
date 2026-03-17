@@ -68,15 +68,12 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src="/weblogo-removebg-preview.png"
+              src="/saaslogo.png"
               alt="EasyUploads Logo"
-              width={36}
-              height={36}
+              width={150}
+              height={100}
               className="shrink-0"
             />
-            <span className="text-base sm:text-lg font-semibold tracking-wide">
-              EasyUploads
-            </span>
           </div>
 
           <Link
