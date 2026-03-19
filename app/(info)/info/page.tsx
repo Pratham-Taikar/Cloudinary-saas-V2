@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function InfoPage() {
   return (
@@ -8,7 +10,15 @@ export default function InfoPage() {
 
       <div className="max-w-6xl mx-auto space-y-20">
         {/* HEADER */}
-        <section className="text-center">
+        <section className="text-left">
+          <Link
+            href="/"
+            className="btn btn-ghost rounded-xl gap-2 mb-4 hover:bg-white/10 transition-all duration-300"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+
           <h1 className="text-4xl font-bold tracking-tight">
             Platform Capabilities
           </h1>

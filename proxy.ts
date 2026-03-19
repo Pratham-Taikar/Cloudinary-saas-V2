@@ -1,48 +1,62 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+/* ================= PUBLIC ROUTES ================= */
 const isPublicRoute = createRouteMatcher([
+  "/",
   "/sign-in",
   "/sign-up",
+
+  // Allowed for ALL users
   "/billings",
   "/contact",
-  "/",
   "/info",
-  "/home",
+
+  // Docs (IMPORTANT)
+  "/docs",
+  "/docs(.*)",
+
 ]);
-const isPublicApiRoute = createRouteMatcher(["/api/videos"]);
+
+/* ================= PUBLIC API ================= */
+const isPublicApiRoute = createRouteMatcher([
+  "/api/videos",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-  const currentUrl = new URL(req.url);
-  const isAccessingDashboard = currentUrl.pathname === "/home";
-  const isApiRequest = currentUrl.pathname.startsWith("/api");
+  const url = new URL(req.url);
+  const pathname = url.pathname;
 
-  // If user is logged in and accessing a public route but not the dashboard
-  if (userId && isPublicRoute(req) && !isAccessingDashboard) {
-    return NextResponse.redirect(new URL("/home", req.url));
-  }
+  const isApiRequest = pathname.startsWith("/api");
 
-  const currPath = currentUrl.pathname;
-  if( !userId && (currPath.startsWith("/home"))){
+  /* ================= PROTECT HOME ================= */
+  if (!userId && pathname.startsWith("/home")) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
-  //not logged in
+  /* ================= NOT LOGGED IN ================= */
   if (!userId) {
-    // If user is not logged in and trying to access a protected route
+    // Protect pages
     if (!isPublicRoute(req) && !isPublicApiRoute(req)) {
       return NextResponse.redirect(new URL("/sign-in", req.url));
     }
 
-    // If the request is for a protected API and the user is not logged in
+    // Protect APIs
     if (isApiRequest && !isPublicApiRoute(req)) {
       return NextResponse.redirect(new URL("/sign-in", req.url));
     }
   }
+
+  /* ================= LOGGED IN USERS ================= */
+  if (userId && (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up"))) {
+    return NextResponse.redirect(new URL("/home", req.url));
+  }
+
   return NextResponse.next();
 });
 
+/* ================= MATCHER ================= */
 export const config = {
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };

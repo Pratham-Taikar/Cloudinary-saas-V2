@@ -324,7 +324,7 @@ function BillingPage() {
         >
           <p className="text-sm opacity-60">
             Need help choosing the right plan?{" "}
-            <Link href="/info" className="text-primary hover:underline">
+            <Link href="/contact" className="text-primary hover:underline">
               Contact our support team
             </Link>
           </p>

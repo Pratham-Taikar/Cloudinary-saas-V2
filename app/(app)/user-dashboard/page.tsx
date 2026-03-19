@@ -175,6 +175,12 @@ function Dashboard() {
               </p>
             </div>
 
+            {!nextPlan && (
+              <p className="text-base text-yellow-500">
+                Higher plans coming soon..
+              </p>
+            )}
+
             {nextPlan && (
               <Link href="/billings">
                 <button className="btn btn-primary mt-6 w-full rounded-xl">

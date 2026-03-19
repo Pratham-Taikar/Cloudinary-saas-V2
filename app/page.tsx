@@ -14,7 +14,7 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
         if (prev < text.length) return prev + 1;
         return prev;
       });
-    }, 150);
+    }, 235);
 
     const exitTimer = setTimeout(() => {
       onFinish();
@@ -37,8 +37,22 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
 
       <div className="absolute inset-0 bg-black/60 backdrop-blur-2xl z-30" />
 
-      <div className="relative z-40 text-lg sm:text-4xl tracking-[0.35em] font-semibold">
-        {text.slice(0, visibleLetters)}
+      <div className="relative z-40 flex gap-1 sm:gap-2 text-2xl sm:text-6xl tracking-[0.35em] font-semibold">
+        {text.split("").map((char, index) => {
+          const isVisible = index < visibleLetters;
+          const isActive = index === visibleLetters - 1;
+
+          return (
+            <span
+              key={index}
+              className={`transition-all duration-300 ease-out
+                ${isVisible ? "opacity-100" : "opacity-0"}
+                ${isActive ? "scale-250 text-primary drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]" : "scale-100"}`}
+            >
+              {char}
+            </span>
+          );
+        })}
       </div>
     </div>
   );
@@ -69,10 +83,10 @@ export default function LandingPage() {
           <img src="/saaslogo.png" alt="weblogo" className="sm:w-50 w-36" />
 
           <div className="flex gap-3">
-            <Link href="/billings" className="btn btn-outline btn-sm">
+            <Link href="/billings" className="btn btn-primary btn-sm">
               Pricing
             </Link>
-            <Link href="/info" className="btn btn-primary btn-sm">
+            <Link href="/info" className="btn btn-outline btn-sm">
               Capabilities
             </Link>
           </div>
@@ -332,7 +346,7 @@ export default function LandingPage() {
         </h1>
 
         <Link
-          href="/sign-in"
+          href="/"
           className="mt-10 btn btn-primary rounded-xl p-4"
         >
           Go to Dashboard
@@ -349,7 +363,7 @@ export default function LandingPage() {
               <a href="/contact" className="hover:text-white transition">
                 Contact
               </a>
-              <a href="/docs" className="hover:text-white transition">
+              <a href="/docs/overview" className="hover:text-white transition">
                 Docs
               </a>
             </div>
