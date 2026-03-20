@@ -37,12 +37,20 @@ const Effects = {
   none: "none",
   cartoonify: "cartoonify",
   vectorize: "vectorize",
-  watercolor: "watercolor",
   sepia: "sepia",
   grayscale: "grayscale",
-  vignette: "vignette",
   blackwhite: "blackwhite",
   negate: "negate",
+};
+
+const EffectPreview: Record<EffectFormat, string> = {
+  none: "/effects/none.png",
+  cartoonify: "/effects/cartoonify.png",
+  vectorize: "/effects/vectorize.png",
+  sepia: "/effects/sepia.png",
+  grayscale: "/effects/grayscale.png",
+  blackwhite: "/effects/blackwhite.png",
+  negate: "/effects/negate.png",
 };
 
 interface User {
@@ -231,31 +239,69 @@ function AddEffects() {
             <>
               <h2 className="card-title mt-6">Select Filter</h2>
 
-              <select
-                className="select select-bordered w-full"
-                value={filterFormat}
-                onChange={(e) => setFilterFormat(e.target.value as FilterFormat)}
-              >
-                {Object.keys(Filters).map((key) => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                {Object.keys(Filters).map((item) => {
+                  const isSelected = filterFormat === item;
+
+                  const preview = `/filters/${Filters[item as FilterFormat]}.png`;
+
+                  return (
+                    <div
+                      key={item}
+                      onClick={() => setFilterFormat(item as FilterFormat)}
+                      className={`min-w-30 cursor-pointer rounded-xl border transition ${isSelected
+                          ? "border-primary scale-105"
+                          : "border-white/10 hover:border-white/30"
+                        }`}
+                    >
+                      {/* FILTER PREVIEW IMAGE */}
+                      <img
+                        src={preview}
+                        alt={item}
+                        className="h-24 w-full object-cover rounded-t-xl"
+                      />
+
+                      {/* LABEL */}
+                      <div className="text-center text-xs py-2 text-white/70 capitalize">
+                        {item}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
               <h2 className="card-title mt-4">Select Effect</h2>
 
-              <select
-                className="select select-bordered w-full"
-                value={effectFormat}
-                onChange={(e) => setEffectFormat(e.target.value as EffectFormat)}
-              >
-                {Object.keys(Effects).map((key) => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {Object.keys(Effects).map((item) => {
+                  const isSelected = effectFormat === item;
+
+                  const preview = EffectPreview[item as EffectFormat];
+
+                  return (
+                    <div
+                      key={item}
+                      onClick={() => setEffectFormat(item as EffectFormat)}
+                      className={`min-w-30 cursor-pointer rounded-xl border transition ${isSelected
+                          ? "border-primary scale-105"
+                          : "border-white/10 hover:border-white/30"
+                        }`}
+                    >
+                      {/* PREVIEW IMAGE */}
+                      <img
+                        src={preview}
+                        alt={item}
+                        className="h-24 w-full object-cover rounded-t-xl"
+                      />
+
+                      {/* LABEL */}
+                      <div className="text-center text-xs py-2 text-white/70 capitalize">
+                        {item}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
               <div className="mt-6 relative">
                 <h3 className="text-lg font-semibold mb-2">Preview:</h3>
@@ -265,7 +311,7 @@ function AddEffects() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="grid">
                     <h2 className="font-semibold">Original:</h2>
                     <CldImage
