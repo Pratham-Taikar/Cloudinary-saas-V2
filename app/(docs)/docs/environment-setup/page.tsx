@@ -1,6 +1,27 @@
 "use client";
 
+import { useState } from "react";
+
 export default function EnvironmentSetupDocPage() {
+  const [showPreview, setShowPreview] = useState(false);
+
+  const sampleEnv = `# ================= CLERK =================
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/home
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/home
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxxxxx
+CLERK_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxx
+
+# ================= DATABASE =================
+DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/database
+
+# ================= CLOUDINARY =================
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+NEXT_PUBLIC_CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+`;
+
   return (
     <div className="space-y-12">
       <div>
@@ -8,40 +29,72 @@ export default function EnvironmentSetupDocPage() {
           Environment Setup
         </h1>
         <p className="text-white/70 text-lg max-w-2xl">
-          Configure environment variables for Cloudinary, MongoDB, and Clerk
-          before running the application.
+          Configure environment variables for authentication, database, and media processing
+          before running the application. These variables are required for the platform to function correctly.
         </p>
       </div>
 
+      {/* ================= REQUIRED VARIABLES ================= */}
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">Required Variables</h2>
-        <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-white/80">
-          {`# Cloudinary
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=...
-NEXT_PUBLIC_CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
 
-# MongoDB
-DATABASE_URL=mongodb+srv://...
-`}
-        </div>
+        <p className="text-sm text-white/70">
+          Instead of exposing real credentials, use the preview below to understand
+          how your <span className="text-white/90">.env</span> file should be structured.
+        </p>
+
+        <button
+          onClick={() => setShowPreview(true)}
+          className="px-5 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 transition text-sm"
+        >
+          Preview .env File
+        </button>
       </section>
 
+      {/* ================= DATABASE ================= */}
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">Database</h2>
         <p className="text-sm text-white/70">
-          The app connects to MongoDB via Mongoose with a cached connection for
-          hot reloads.
+          The application connects to MongoDB using a persistent connection strategy.
+          A cached connection is used during development to prevent unnecessary reconnections
+          during hot reloads.
         </p>
       </section>
 
+      {/* ================= HEALTH CHECK ================= */}
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">Health Check</h2>
         <p className="text-sm text-white/70">
-          Verify connectivity at /api/health/db. On success you receive a 200
-          response.
+          You can verify database connectivity using the endpoint
+          <span className="text-white/90"> /api/health/db</span>.
+          A successful connection returns a <span className="text-white/90">200 OK</span> response.
         </p>
       </section>
+
+      {/* ================= FULLSCREEN PREVIEW ================= */}
+      {showPreview && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col">
+
+          {/* TOP BAR */}
+          <div className="flex justify-between items-center px-6 py-4 border-b border-white/10">
+            <h2 className="text-lg font-semibold">.env Preview</h2>
+
+            <button
+              onClick={() => setShowPreview(false)}
+              className="text-sm px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20"
+            >
+              Close
+            </button>
+          </div>
+
+          {/* CONTENT */}
+          <div className="flex-1 overflow-auto p-6">
+            <pre className="bg-black/60 border border-white/10 rounded-xl p-6 text-sm text-white/80 font-mono whitespace-pre-wrap wrap-break-word">
+              {sampleEnv}
+            </pre>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

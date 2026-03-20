@@ -1,4 +1,6 @@
  "use client";
+
+ import Link from "next/link";
  
  export default function TroubleshootingDocPage() {
    return (
@@ -36,6 +38,16 @@
          <p className="text-sm text-white/70">
            Verify your Cloudinary environment variables are set. Missing keys result in a 500 error on upload.
          </p>
+       </section>
+
+       <section>
+         <h2 className="text-md text-gray-400">If you are still facing issues related to above terms, you can communicate with us</h2>
+        <Link
+          href={"/contact"}
+          className="mt-4 btn btn-sm btn-outline"
+          >
+            Contact us 
+          </Link>
        </section>
      </div>
    );

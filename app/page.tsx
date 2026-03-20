@@ -114,6 +114,9 @@ export default function LandingPage() {
           <Link href="/billings" className="btn btn-outline px-8">
             View Pricing
           </Link>
+          <Link href="/docs/overview" className="btn btn-outline px-8">
+            Docs
+          </Link>
         </div>
       </section>
 

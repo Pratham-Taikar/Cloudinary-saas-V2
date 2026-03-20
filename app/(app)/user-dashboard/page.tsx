@@ -154,6 +154,9 @@ function Dashboard() {
                 }}
               />
             </div>
+            <Link href="/docs/overview" className="btn btn-sm btn-outline px-4 sm:px-8 mt-4">
+              Read Documentation
+            </Link>
           </div>
 
           {/* Plan Info */}
