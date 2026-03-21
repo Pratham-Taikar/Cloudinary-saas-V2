@@ -186,7 +186,7 @@ function AddEffects() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `${filterFormat}_${effectFormat}.png`;
+        link.download = `transformed_image.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

@@ -10,6 +10,7 @@ import {
   LayoutDashboardIcon,
   CloudUpload,
   Brain,
+  Bot,
   Wallpaper,
   Sparkles,
   Proportions,

@@ -10,6 +10,8 @@ export default function ContactPage() {
         message: "",
     });
 
+    const adminEmail = "prathamtaikar26@gmail.com";
+
     const handleChange = (e: any) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -44,8 +46,8 @@ ${form.name}
 `
     );
 
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=prathamtaikar26@gmail.com&su=${subject}&body=${body}`;
-    const mailtoFallback = `mailto:prathamtaikar26@gmail.com?subject=${subject}&body=${body}`;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${adminEmail}&su=${subject}&body=${body}`;
+    const mailtoFallback = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
 
     const newWindow = window.open(gmailUrl, "_blank");
 

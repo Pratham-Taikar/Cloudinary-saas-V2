@@ -250,7 +250,7 @@ export default function LandingPage() {
               Different prompts, different results.
             </p>
             <p className="sm:mt-4 sm:border sm:w-fit sm:px-4 sm:py-2 sm:border-yellow-600 sm:text-white sm:rounded-full font-semibold text-yellow-600 sm:text-base text-sm mt-2">
-              Prompt: Grassland and tree with yellow leaves.
+              Prompt: Teddy bears arranged on shelf.
             </p>
           </div>
 

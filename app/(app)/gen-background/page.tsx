@@ -153,7 +153,7 @@ function GenerateBackground() {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `${fileName}_generated.png`;
+        link.download = `background_generated.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
