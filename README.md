@@ -104,11 +104,23 @@ The "Processing Unit" is a virtualized engine that constructs Cloudinary transfo
 
 ## **Payment Gateway Logic**
 
-The platform implements a tiered subscription logic:
+The platform implements a tiered subscription logic integrated with **Razorpay**:
 
-- **Checkout Flow**: Users are redirected to a secure checkout environment when upgrading.
+- **Checkout Flow**: Users are redirected to a secure checkout environment at `/checkout` when upgrading from the `/billings` page.
+- **Order Creation**: A unique order is created on the backend using the Razorpay SDK (`/api/razorpay/order`).
+- **Payment Verification**: Once the user completes the payment, the frontend receives a `razorpay_payment_id` and `razorpay_signature`, which are verified on the backend (`/api/razorpay/verify`) using HMAC SHA256 before upgrading the user's plan in MongoDB.
 - **Plan Enforcement**: The application checks the user's current `plan` against the limits defined in `lib/services.ts` before allowing any processing task.
 - **Limit Validation**: A dedicated `LimitReached` component provides a clear UI for users to upgrade when they exceed their tier's capacity.
+
+### **Manual Testing (Test Mode)**
+1. **Prerequisites**: Ensure `NEXT_PUBLIC_RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` are correctly set in your `.env` file.
+2. **Step 1**: Go to the `/billings` page and select either the **Elite** or **Mega** plan.
+3. **Step 2**: You will be redirected to the `/checkout` page. Click on **Pay Now**.
+4. **Step 3**: The Razorpay modal will open. Since it's in **Test Mode**, use any of the test payment methods:
+   - **Card**: Use `4111 1111 1111 1111` for a successful payment. Use any expiry date and CVV.
+   - **Netbanking**: Select any bank and click "Success".
+5. **Step 4**: After successful payment, you will be redirected back to the dashboard, and your plan will be updated to the selected tier.
+6. **Step 5**: Verify the upgrade in the dashboard or by checking the MongoDB user document.
 
 ## **RBAC Logic**
 

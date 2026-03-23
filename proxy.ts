@@ -30,6 +30,11 @@ export default clerkMiddleware(async (auth, req) => {
 
   const isApiRequest = pathname.startsWith("/api");
 
+  /* ================= ALLOW ALL APIs ================= */
+  if (isApiRequest) {
+    return NextResponse.next();
+  }
+
   /* ================= PROTECT HOME ================= */
   if (!userId && pathname.startsWith("/home")) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
@@ -37,19 +42,16 @@ export default clerkMiddleware(async (auth, req) => {
 
   /* ================= NOT LOGGED IN ================= */
   if (!userId) {
-    // Protect pages
-    if (!isPublicRoute(req) && !isPublicApiRoute(req)) {
-      return NextResponse.redirect(new URL("/sign-in", req.url));
-    }
-
-    // Protect APIs
-    if (isApiRequest && !isPublicApiRoute(req)) {
+    if (!isPublicRoute(req)) {
       return NextResponse.redirect(new URL("/sign-in", req.url));
     }
   }
 
   /* ================= LOGGED IN USERS ================= */
-  if (userId && (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up"))) {
+  if (
+    userId &&
+    (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up"))
+  ) {
     return NextResponse.redirect(new URL("/home", req.url));
   }
 

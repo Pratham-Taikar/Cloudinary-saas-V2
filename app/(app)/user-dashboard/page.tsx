@@ -15,16 +15,35 @@ interface User {
   plan: PlanKey;
 }
 
+interface Payment {
+  _id: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  amount: number;
+  plan: string;
+  status: string;
+  createdAt: string;
+}
+
 function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get("/api/user");
-      setUser(res.data);
+      const [userRes, paymentsRes] = await Promise.all([
+        axios.get("/api/user"),
+        axios.get("/api/user/payments").catch((err) => {
+          console.error("Dashboard: Failed to fetch payments", err);
+          return { data: [] }; // Fallback to empty list
+        }),
+      ]);
+      setUser(userRes.data);
+      setPayments(Array.isArray(paymentsRes.data) ? paymentsRes.data : []);
     } catch (err) {
+      console.error("Dashboard: Critical fetch error", err);
       setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
@@ -42,25 +61,17 @@ function Dashboard() {
       </div>
     );
 
-  if (error)
-    return <div className="text-center text-red-500">{error}</div>;
+  if (error) return <div className="text-center text-red-500">{error}</div>;
 
-  if (!user)
-    return <div className="text-center">User not found</div>;
+  if (!user) return <div className="text-center">User not found</div>;
 
   const plan = services[user.plan] || services.free;
   const nextPlanKey = getNextPlan(user.plan);
   const nextPlan = nextPlanKey ? services[nextPlanKey] : null;
 
-  const remainingVideos = Math.max(
-    plan.videoLimit - user.videoCount,
-    0
-  );
+  const remainingVideos = Math.max(plan.videoLimit - user.videoCount, 0);
 
-  const remainingImages = Math.max(
-    plan.imageLimit - user.imageCount,
-    0
-  );
+  const remainingImages = Math.max(plan.imageLimit - user.imageCount, 0);
 
   const imagelimitReached = remainingImages === 0;
   const videoLimitReached = remainingVideos === 0;
@@ -68,20 +79,21 @@ function Dashboard() {
   return (
     <div className="relative min-h-screen px-4 sm:px-6">
       <div className="max-w-6xl mx-auto py-8 space-y-10">
-
-        {(imagelimitReached && videoLimitReached) && (
+        {imagelimitReached && videoLimitReached && (
           <div className="rounded-xl border border-red-500/50 bg-red-500/10 p-4 text-center text-red-400 font-medium">
-            Your plan has reached maximum uploads. Please upgrade to increase upload limits.
+            Your plan has reached maximum uploads. Please upgrade to increase
+            upload limits.
           </div>
         )}
 
         {/* ================= USER CARD ================= */}
-        <div className="flex flex-col sm:flex-row items-center gap-6 rounded-2xl p-6
+        <div
+          className="flex flex-col sm:flex-row items-center gap-6 rounded-2xl p-6
           bg-white/10 dark:bg-black/20
           backdrop-blur-xl
           border border-white/10
-          shadow-lg">
-
+          shadow-lg"
+        >
           {user.avatarUrl && (
             <img
               src={user.avatarUrl}
@@ -94,32 +106,25 @@ function Dashboard() {
             <p className="text-lg sm:text-xl font-semibold">
               {user.username || "User"}
             </p>
-            <p className="text-sm opacity-70 break-all">
-              {user.email}
-            </p>
+            <p className="text-sm opacity-70 break-all">{user.email}</p>
             <p className="mt-2 text-sm">
-              Plan:{" "}
-              <span className="font-semibold">
-                {plan.name}
-              </span>
+              Plan: <span className="font-semibold">{plan.name}</span>
             </p>
           </div>
         </div>
 
         {/* ================= STATS GRID ================= */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
           {/* Usage Summary */}
-          <div className={`rounded-2xl p-6
+          <div
+            className={`rounded-2xl p-6
             bg-white/10 dark:bg-black/20
             backdrop-blur-xl
             border
             shadow-lg
             ${imagelimitReached && videoLimitReached ? "border-red-500/60" : "border-white/10"}`}
           >
-            <h2 className="text-lg font-semibold mb-4">
-              Usage Summary
-            </h2>
+            <h2 className="text-lg font-semibold mb-4">Usage Summary</h2>
 
             {/* Video usage */}
             <p className="text-sm mb-1">
@@ -132,7 +137,7 @@ function Dashboard() {
                 style={{
                   width: `${Math.min(
                     (user.videoCount / plan.videoLimit) * 100,
-                    100
+                    100,
                   )}%`,
                 }}
               />
@@ -149,23 +154,27 @@ function Dashboard() {
                 style={{
                   width: `${Math.min(
                     (user.imageCount / plan.imageLimit) * 100,
-                    100
+                    100,
                   )}%`,
                 }}
               />
             </div>
-            <Link href="/docs/overview" className="btn btn-sm btn-outline px-4 sm:px-8 mt-4">
+            <Link
+              href="/docs/overview"
+              className="btn btn-sm btn-outline px-4 sm:px-8 mt-4"
+            >
               Read Documentation
             </Link>
           </div>
 
           {/* Plan Info */}
-          <div className="rounded-2xl p-6 flex flex-col justify-between
+          <div
+            className="rounded-2xl p-6 flex flex-col justify-between
             bg-white/10 dark:bg-black/20
             backdrop-blur-xl
             border border-white/10
-            shadow-lg">
-
+            shadow-lg"
+          >
             <div>
               <h2 className="text-lg font-semibold mb-2">
                 {plan.name} Plan Limits
@@ -194,6 +203,64 @@ function Dashboard() {
           </div>
         </div>
 
+        {/* ================= PAYMENT HISTORY ================= */}
+        <div
+          className="rounded-2xl p-6
+          bg-white/10 dark:bg-black/20
+          backdrop-blur-xl
+          border border-white/10
+          shadow-lg"
+        >
+          <h2 className="text-xl font-bold mb-6">Payment History</h2>
+
+          {payments.length === 0 ? (
+            <div className="text-center py-10 opacity-60">
+              No payments found.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="bg-transparent text-sm">Date</th>
+                    <th className="bg-transparent text-sm">Plan</th>
+                    <th className="bg-transparent text-sm">Amount</th>
+                    <th className="bg-transparent text-sm">Order ID</th>
+                    <th className="bg-transparent text-sm">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((payment) => (
+                    <tr
+                      key={payment._id}
+                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                    >
+                      <td className="bg-transparent py-4">
+                        {new Date(payment.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="bg-transparent py-4 font-medium">
+                        {payment.plan}
+                      </td>
+                      <td className="bg-transparent py-4 font-bold">
+                        ₹{payment.amount}
+                      </td>
+                      <td className="bg-transparent py-4 text-xs opacity-60">
+                        {payment.razorpay_order_id}
+                      </td>
+                      <td className="bg-transparent py-4">
+                        <span
+                          className={`badge badge-sm ${payment.status === "success" ? "badge-success" : "badge-error"}`}
+                        >
+                          {payment.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
