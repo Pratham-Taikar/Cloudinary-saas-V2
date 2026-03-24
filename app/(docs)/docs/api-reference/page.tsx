@@ -1,112 +1,186 @@
 "use client";
 
+import React from "react";
+import { Globe, Code2, Lock, Database, CreditCard } from "lucide-react";
+
 export default function ApiReferencePage() {
   return (
-    <div className="space-y-12">
-      <div>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4">API Reference</h1>
-        <p className="text-white/70 text-lg max-w-2xl">
-          A complete reference for interacting with EasyUploads programmatically.
-          These endpoints allow you to upload, process, and retrieve media using a secure,
-          authenticated workflow powered by Clerk.
+    <div className="space-y-16 pb-20">
+      {/* ================= HEADER ================= */}
+      <section>
+        <h1 className="text-4xl sm:text-5xl font-extrabold mb-6 tracking-tight">
+          API Reference
+        </h1>
+        <p className="text-white/70 text-xl max-w-3xl leading-relaxed">
+          The EasyUploads REST API provides a programatic interface for media
+          transformation and user management. All requests are authenticated via
+          Clerk and scoped to the active user session.
         </p>
+      </section>
+
+      {/* ================= BASE CONFIG ================= */}
+      <section className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-4">
+        <div className="flex items-center gap-3 text-primary">
+          <Globe className="w-5 h-5" />
+          <h3 className="font-bold">Base URL</h3>
+        </div>
+        <code className="block p-3 rounded-lg bg-black/40 text-sm text-white/80 border border-white/5">
+          website_url/api
+        </code>
+        <div className="flex items-center gap-3 text-primary pt-4">
+          <Lock className="w-5 h-5" />
+          <h3 className="font-bold">Authentication</h3>
+        </div>
+        <p className="text-sm text-white/50">
+          Bearers tokens are managed automatically by the{" "}
+          <code className="bg-white/10 px-1 rounded text-xs">
+            ClerkProvider
+          </code>
+          . For server-to-server requests, ensure the{" "}
+          <code className="bg-white/10 px-1 rounded text-xs">__session</code>{" "}
+          cookie is present.
+        </p>
+      </section>
+
+      {/* ================= ENDPOINTS ================= */}
+      <div className="space-y-12">
+        {/* USER ENDPOINT */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 border-b border-white/10 pb-2">
+            <Database className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">User & Identity</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-green-500/20 text-green-400 text-[10px] font-bold uppercase">
+                GET
+              </span>
+              <code className="text-lg font-bold text-white/90">/api/user</code>
+            </div>
+            <p className="text-sm text-white/60">
+              Retrieves the user profile, including active plan and usage
+              metrics. This endpoint also triggers the{" "}
+              <strong>Subscription Credit Reset</strong> logic.
+            </p>
+            <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-white/80">
+              {`Response (200 OK):
+{
+  "userId": "user_2...",
+  "plan": "elite",
+  "imageCount": 12,
+  "videoCount": 2,
+  "lastBillingDate": "2024-03-24T..."
+}`}
+            </div>
+          </div>
+        </section>
+
+        {/* MEDIA ENDPOINTS */}
+        <section className="space-y-10">
+          <div className="flex items-center gap-3 border-b border-white/10 pb-2">
+            <Code2 className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">Media Processing</h2>
+          </div>
+
+          {/* IMAGE UPLOAD */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
+                POST
+              </span>
+              <code className="text-lg font-bold text-white/90">
+                /api/image-upload
+              </code>
+            </div>
+            <p className="text-sm text-white/60">
+              Uploads a raw buffer to Cloudinary and increments usage. Returns a{" "}
+              <code className="bg-white/10 px-1 rounded text-xs">publicId</code>{" "}
+              for transformation mapping.
+            </p>
+            <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-white/80">
+              {`Body (Multipart):
+  file: Binary Data (Required)
+
+Response (201 Created):
+{
+  "publicId": "v123456/user_abc/...",
+  "url": "https://res.cloudinary.com/..."
+}`}
+            </div>
+          </div>
+
+          {/* VIDEO UPLOAD */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
+                POST
+              </span>
+              <code className="text-lg font-bold text-white/90">
+                /api/video-upload
+              </code>
+            </div>
+            <p className="text-sm text-white/60">
+              Processes video assets with automated compression. Metadata is
+              persisted in the{" "}
+              <code className="bg-white/10 px-1 rounded text-xs">Video</code>{" "}
+              collection.
+            </p>
+          </div>
+        </section>
+
+        {/* PAYMENT ENDPOINTS */}
+        <section className="space-y-10">
+          <div className="flex items-center gap-3 border-b border-white/10 pb-2">
+            <CreditCard className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">Billing & Payments</h2>
+          </div>
+
+          {/* RAZORPAY ORDER */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
+                POST
+              </span>
+              <code className="text-lg font-bold text-white/90">
+                /api/razorpay/order
+              </code>
+            </div>
+            <p className="text-sm text-white/60">
+              Initiates a transaction by creating a Razorpay order record.
+            </p>
+            <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-white/80">
+              {`Body (JSON):
+{
+  "planKey": "elite"
+}
+
+Response (200 OK):
+{
+  "id": "order_O123...",
+  "amount": 14900,
+  "currency": "INR"
+}`}
+            </div>
+          </div>
+
+          {/* RAZORPAY VERIFY */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
+                POST
+              </span>
+              <code className="text-lg font-bold text-white/90">
+                /api/razorpay/verify
+              </code>
+            </div>
+            <p className="text-sm text-white/60">
+              Validates the HMAC SHA256 signature from Razorpay and upgrades the
+              user tier.
+            </p>
+          </div>
+        </section>
       </div>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">POST /api/image-upload</h2>
-        <p className="text-sm text-white/70">
-          Upload an image and receive a <span className="text-white/90">publicId</span>
-          for rendering and further transformations. This endpoint also updates your usage counters.
-        </p>
-        <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs
-         text-white/80 whitespace-pre-wrap wrap-break-word">
-          {`Headers:
-  Authorization: (handled automatically via Clerk session)
-
-Body (multipart/form-data):
-  file: <binary image>
-
-Responses:
-  201 { publicId: string, user: { ... } }
-  401 Unauthorized — User is not authenticated
-  403 Forbidden — Image usage limit reached
-  400 Bad Request — File missing or invalid
-  500 Internal Server Error — Upload failed`}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">POST /api/video-upload</h2>
-        <p className="text-sm text-white/70">
-          Upload a video file and automatically compress it into an optimized MP4 format.
-          Compression settings are applied dynamically based on content and size.
-        </p>
-        <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs
-         text-white/80 whitespace-pre-wrap wrap-break-word">
-          {`Headers:
-  Authorization: (handled via Clerk session)
-
-Body (multipart/form-data):
-  file: <binary video>
-  title: string
-  description: string (optional)
-  originalSize: number
-
-Responses:
-  201 { video: {...}, updatedUser: {...} }
-  401 Unauthorized — User is not authenticated
-  403 Forbidden — Video usage limit reached
-  400 Bad Request — File missing or invalid
-  500 Internal Server Error — Processing failed`}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">GET /api/videos</h2>
-        <p className="text-sm text-white/70">
-          Retrieve a list of all videos uploaded by the authenticated user,
-          including metadata such as duration, title, and storage identifiers.
-        </p>
-        <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs
-         text-white/80 whitespace-pre-wrap wrap-break-word">
-          {`Headers:
-  Authorization: (required)
-
-Responses:
-  200 [ { _id, title, publicId, duration, ... }, ... ]
-  401 Unauthorized — Authentication required
-  500 Internal Server Error — Failed to fetch data`}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">GET /api/user</h2>
-        <p className="text-sm text-white/70">
-          Fetch or initialize the current user's profile, including subscription plan,
-          usage limits, and processed media counts.
-        </p>
-        <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs
-         text-white/80 whitespace-pre-wrap wrap-break-word">
-          {`Responses:
-  200 { userId, plan, imageCount, videoCount, ... }
-  401 Unauthorized — Authentication required
-  500 Internal Server Error — Failed to fetch user`}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">GET /api/health/db</h2>
-        <p className="text-sm text-white/70">
-          Verify database connectivity and ensure the backend is operational.
-          Useful for debugging and monitoring system health.
-        </p>
-        <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs
-        text-white/80 whitespace-pre-wrap wrap-break-word">
-          {`Responses:
-  200 { success: true }
-  500 { success: false, message }`}
-        </div>
-      </section>
     </div>
   );
 }

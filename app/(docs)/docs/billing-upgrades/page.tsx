@@ -1,82 +1,104 @@
 "use client";
 
+import React from "react";
+import {
+  CreditCard,
+  RefreshCw,
+  Zap,
+  ShieldCheck,
+  Calendar,
+} from "lucide-react";
+
 export default function BillingUpgradesDocPage() {
   return (
-    <div className="space-y-12">
-      <div>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4">Billing & Upgrades</h1>
-        <p className="text-white/70 text-lg max-w-2xl">
-          Manage your subscription, compare plans, and scale your usage as your needs grow.
-          Upgrades are applied instantly, allowing uninterrupted access to higher processing limits.
+    <div className="space-y-16 pb-20">
+      {/* ================= HEADER ================= */}
+      <section>
+        <h1 className="text-4xl sm:text-5xl font-extrabold mb-6 tracking-tight text-white">
+          Billing & Subscription
+        </h1>
+        <p className="text-white/70 text-xl max-w-3xl leading-relaxed">
+          Manage your processing power with our scalable subscription tiers.
+          Powered by Razorpay, our billing system ensures secure transactions
+          and automated credit management for uninterrupted workflows.
         </p>
-      </div>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Plans Overview</h2>
-        <p className="text-white/70 text-sm">
-          EasyUploads offers flexible plans designed for individuals, creators, and teams.
-          Choose a plan based on your monthly processing requirements.
-        </p>
-
-        <ul className="space-y-3 text-white/70 text-sm">
-          <li>
-            • <span className="text-white font-medium">Free</span> —
-            Ideal for getting started and testing the platform. Includes
-            <span className="text-white/90"> 10 image transformations</span> and
-            <span className="text-white/90"> 3 video compressions</span> per month.
-          </li>
-
-          <li>
-            • <span className="text-white font-medium">Elite</span> —
-            Designed for regular usage and small-scale workflows. Includes
-            <span className="text-white/90"> 75 image transformations</span> and
-            <span className="text-white/90"> 20 video compressions</span>.
-          </li>
-    
-          <li>
-            • <span className="text-white font-medium">Mega</span> —
-            Best suited for heavy usage and production workloads. Includes
-            <span className="text-white/90"> 250 image transformations</span> and
-            <span className="text-white/90"> 50 video compressions</span>.
-          </li>
-        </ul>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Upgrade Flow</h2>
-        <p className="text-sm text-white/70">
-          Upgrading your plan is simple and takes effect immediately without requiring any additional setup.
+      {/* ================= SUBSCRIPTION LIFECYCLE ================= */}
+      <section className="space-y-8">
+        <h2 className="text-2xl font-bold border-b border-white/10 pb-2 flex items-center gap-2">
+          <RefreshCw className="w-6 h-6 text-primary" /> The 30-Day Lifecycle
+        </h2>
+        <p className="text-white/60 leading-relaxed">
+          Every subscription on EasyUploads operates on a strict 30-day billing
+          cycle. Understanding this lifecycle is key to managing your processing
+          quotas effectively.
         </p>
 
-        <ul className="list-disc ml-6 space-y-2 text-white/70 text-sm">
-          <li>Navigate to the <span className="text-white/90">/billings</span> page</li>
-          <li>Review available plans and current usage</li>
-          <li>Select the plan that fits your requirements</li>
-          <li>Confirm the upgrade to unlock increased limits instantly</li>
-        </ul>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+            <h4 className="font-bold mb-3 flex items-center gap-2 text-primary">
+              <Zap className="w-4 h-4" /> Credit Resets
+            </h4>
+            <p className="text-sm text-white/50 leading-relaxed">
+              Your image transformation and video compression counts are
+              automatically reset to zero every 30 days from your{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                lastBillingDate
+              </code>
+              . Credits do not roll over to the next month.
+            </p>
+          </div>
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+            <h4 className="font-bold mb-3 flex items-center gap-2 text-primary">
+              <Calendar className="w-4 h-4" /> Plan Expiry
+            </h4>
+            <p className="text-sm text-white/50 leading-relaxed">
+              Premium plans (Elite & Mega) have a fixed 30-day validity. If a
+              renewal payment is not detected by the{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                planExpiry
+              </code>{" "}
+              date, your account will gracefully revert to the Free tier.
+            </p>
+          </div>
+        </div>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">When to Upgrade</h2>
-        <p className="text-white/70 text-sm">
-          Consider upgrading your plan if you encounter any of the following:
-        </p>
-
-        <ul className="space-y-2 text-white/70 text-sm">
-          <li>• You frequently reach your monthly usage limits</li>
-          <li>• You are processing media as part of a production workflow</li>
-          <li>• You need faster turnaround with higher capacity</li>
-        </ul>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Important Notes</h2>
-        <ul className="space-y-2 text-white/70 text-sm">
-          <li>• Plan limits reset at the start of each billing cycle</li>
-          <li>• Upgrades are applied immediately after confirmation</li>
-          <li>• Downgrades (if available) take effect in the next cycle</li>
-          <li>• Usage is tracked per account, not per device</li>
-        </ul>
+      {/* ================= PAYMENT FLOW ================= */}
+      <section className="space-y-8">
+        <h2 className="text-2xl font-bold border-b border-white/10 pb-2 flex items-center gap-2">
+          <ShieldCheck className="w-6 h-6 text-green-400" /> Secure Payments
+        </h2>
+        <div className="prose prose-invert max-w-none">
+          <p className="text-white/70">
+            We use Razorpay for all financial transactions. The upgrade process
+            is synchronous and secure:
+          </p>
+          <ol className="text-white/60 text-sm space-y-4 list-decimal ml-6">
+            <li>
+              <strong>Order Creation</strong>: Our backend generates a unique
+              Razorpay Order ID tied to your session and selected plan.
+            </li>
+            <li>
+              <strong>Secure Handshake</strong>: The Razorpay Checkout modal
+              handles sensitive card/UPI data directly on their secure servers.
+            </li>
+            <li>
+              <strong>Verification</strong>: Upon payment, our server performs a
+              HMAC SHA256 signature verification to ensure the transaction's
+              integrity.
+            </li>
+            <li>
+              <strong>Instant Provisioning</strong>: Once verified, your tier
+              limits are updated in MongoDB, and a record is added to your{" "}
+              <code className="text-xs bg-white/10 px-1 rounded">
+                PaymentHistory
+              </code>
+              .
+            </li>
+          </ol>
+        </div>
       </section>
     </div>
   );
