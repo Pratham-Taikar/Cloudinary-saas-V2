@@ -24,8 +24,8 @@ function GenerateBackground() {
   const [hasGenerated, setHasGenerated] = useState(false);
   const [transformKey, setTransformKey] = useState(0);
   const [isReuploading, setIsReuploading] = useState(false);
-  const [fileName, setFileName] = useState("")
-  const [inputLength, setInputLength] = useState<number>(0)
+  const [fileName, setFileName] = useState("");
+  const [inputLength, setInputLength] = useState<number>(0);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<User | null>(null);
   const [checkingLimit, setCheckingLimit] = useState(true);
@@ -68,7 +68,7 @@ function GenerateBackground() {
   } | null>(null);
 
   const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -94,8 +94,11 @@ function GenerateBackground() {
       if (totalPixels > MAX_PIXELS) {
         setIsUploading(false);
 
-        toast.error(`Image resolution too large (${Math.round(totalPixels / 1_000_000)
-          } MP). Please upload an image under 25 MP.`);
+        toast.error(
+          `Image resolution too large (${Math.round(
+            totalPixels / 1_000_000,
+          )} MP). Please upload an image under 25 MP.`,
+        );
 
         setFileName("");
         setImageSize(null);
@@ -119,15 +122,15 @@ function GenerateBackground() {
         });
 
         if (!response.ok) {
-          toast.error("Failed to upload image")
-          throw new Error("Failed to upload image")
-        };
+          toast.error("Failed to upload image");
+          throw new Error("Failed to upload image");
+        }
 
         const data = await response.json();
         setUploadedImage(data.publicId);
         setIsTransforming(true);
 
-        toast.success("Image uploaded")
+        toast.success("Image uploaded");
       } catch {
         toast.error("Failed to upload image");
       } finally {
@@ -196,7 +199,7 @@ function GenerateBackground() {
 
           <input
             type="file"
-            accept='image/*'
+            accept="image/*"
             ref={fileInputRef}
             onChange={handleFileUpload}
             className="file-input file-input-bordered file-input-primary w-full"
@@ -223,14 +226,21 @@ function GenerateBackground() {
                       setBackgroundEffect(
                         e.target.value && e.target.value.length <= 50
                           ? `gen_background_replace:${e.target.value}`
-                          : null
+                          : null,
                       );
                     }}
                   />
                   {inputLength > 50 && (
-                    <p className="mt-2 text-red-500 font-bold">Prompt exceeds 50 characters</p>
+                    <p className="mt-2 text-red-500 font-bold">
+                      Prompt exceeds 50 characters
+                    </p>
                   )}
-                  <p className="mt-2 text-gray-400 text-right">Max limit: 50 characters</p>
+                  <p className="mt-2 text-gray-400 text-right flex justify-end items-center gap-2">
+                    <span className="text-yellow-500 text-xs">
+                      ({inputLength})
+                    </span>
+                    Max limit: 50 characters
+                  </p>
 
                   {!hasGenerated && (
                     <button
@@ -243,7 +253,6 @@ function GenerateBackground() {
                   )}
                 </>
               )}
-
 
               {hasGenerated && uploadedImage && (
                 <div className="mt-6 relative">
@@ -280,7 +289,7 @@ function GenerateBackground() {
                         gravity="auto"
                         quality="auto"
                         replaceBackground={{
-                          prompt: `${backgroundEffect}`
+                          prompt: `${backgroundEffect}`,
                         }}
                         restore={true}
                         alt="Generated image"
