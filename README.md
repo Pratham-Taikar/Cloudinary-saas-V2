@@ -113,6 +113,7 @@ The platform implements a tiered subscription logic integrated with **Razorpay**
 - **Limit Validation**: A dedicated `LimitReached` component provides a clear UI for users to upgrade when they exceed their tier's capacity.
 
 ### **Manual Testing (Test Mode)**
+
 1. **Prerequisites**: Ensure `NEXT_PUBLIC_RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` are correctly set in your `.env` file.
 2. **Step 1**: Go to the `/billings` page and select either the **Elite** or **Mega** plan.
 3. **Step 2**: You will be redirected to the `/checkout` page. Click on **Pay Now**.
@@ -129,6 +130,16 @@ Role-Based Access Control is enforced through subscription tiers:
 - **Access Control**: Features are unlocked based on the user's `plan`.
 - **Backend Guard**: API routes validate usage counts against plan limits to prevent unauthorized over-usage.
 - **UI State**: Navigation and tool availability dynamically adjust based on the user's tier.
+
+## **Subscription & Credit Reset Logic**
+
+EasyUploads features a robust automated subscription lifecycle management system:
+
+- **Monthly Credit Reset**: Every 30 days from the user's `lastBillingDate`, their `imageCount` and `videoCount` are automatically reset to 0, providing fresh credits for the new month.
+- **Automated Plan Expiry**: Premium plans (`elite`, `mega`) have a 30-day validity period.
+- **Graceful Downgrade**: If a premium plan is not renewed (re-paid) before its `planExpiry` date, the system automatically reverts the user to the **Free** plan.
+- **On-Demand Validation**: Subscription checks are performed in real-time whenever a user accesses their dashboard (`/api/user`), ensuring their credits and plan status are always up-to-date without needing a background cron job.
+- **Renewal Reset**: Upon successful payment through Razorpay, the billing cycle and plan expiry are immediately extended by another 30 days, and current usage counts are reset.
 
 ## **Plans**
 

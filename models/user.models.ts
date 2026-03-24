@@ -9,6 +9,8 @@ export interface IUser extends Document {
   imageCount: number;
   videoCount: number;
   plan: PlanKey;
+  lastBillingDate: Date;
+  planExpiry?: Date;
 }
 
 const userSchema: Schema<IUser> = new Schema(
@@ -39,6 +41,13 @@ const userSchema: Schema<IUser> = new Schema(
       type: String,
       enum: ["free", "elite", "mega"],
       default: "free",
+    },
+    lastBillingDate: {
+      type: Date,
+      default: Date.now,
+    },
+    planExpiry: {
+      type: Date,
     },
   },
   { timestamps: true }

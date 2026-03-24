@@ -5,6 +5,7 @@ import connectDB from "@/lib/db";
 import User from "@/models/user.models";
 import PaymentHistory from "@/models/payment.models";
 import services, { type PlanKey } from "@/lib/services";
+import dayjs from "dayjs";
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,10 +62,20 @@ export async function POST(request: NextRequest) {
       console.log("VERIFY_LOG: Signature valid. Connecting to DB...");
       await connectDB();
 
-      // 1. Update user plan
+      // Set plan expiry to 30 days from now
+      const planExpiry = dayjs().add(30, "day").toDate();
+      const lastBillingDate = new Date();
+
+      // 1. Update user plan and billing info
       const updatedUser = await User.findOneAndUpdate(
         { userId: userId },
-        { plan: planKey as PlanKey },
+        { 
+          plan: planKey as PlanKey,
+          planExpiry,
+          lastBillingDate,
+          imageCount: 0, // Reset counts on new payment
+          videoCount: 0
+        },
         { new: true },
       );
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import connectDB from "@/lib/db";
 import User from "@/models/user.models";
+import { checkAndResetSubscription } from "@/lib/subscription";
 
 export async function GET() {
   try {
@@ -28,7 +29,11 @@ export async function GET() {
         imageCount: 0,
         videoCount: 0,
         plan: "free",
+        lastBillingDate: new Date(),
       });
+    } else {
+      // Check and reset subscription credits/plan if needed
+      await checkAndResetSubscription(user);
     }
 
     return NextResponse.json(user, { status: 200 });
