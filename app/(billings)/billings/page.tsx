@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
@@ -14,19 +15,27 @@ import {
   Sparkles,
   Shield,
   Clock,
-  Users
+  Users,
+  Loader2,
 } from "lucide-react";
 import services, { planOrder, type PlanKey } from "@/lib/services";
 import faqs from "@/lib/faqs";
 
-const planMeta: Record<PlanKey, {
-  tagline: string;
-  features: string[];
-  badge?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  gradient: string;
-  popular?: boolean;
-}> = {
+interface User {
+  plan: PlanKey;
+}
+
+const planMeta: Record<
+  PlanKey,
+  {
+    tagline: string;
+    features: string[];
+    badge?: string;
+    icon: React.ComponentType<{ className?: string }>;
+    gradient: string;
+    popular?: boolean;
+  }
+> = {
   free: {
     tagline: "Perfect for getting started",
     features: ["Standard processing", "Basic support"],
@@ -36,7 +45,11 @@ const planMeta: Record<PlanKey, {
   elite: {
     tagline: "Best for creators & power users",
     badge: "Most Popular",
-    features: ["High-quality optimization", "Priority processing", "Email support"],
+    features: [
+      "High-quality optimization",
+      "Priority processing",
+      "Email support",
+    ],
     icon: Star,
     gradient: "from-primary/30 to-green-500/30",
     popular: true,
@@ -44,7 +57,11 @@ const planMeta: Record<PlanKey, {
   mega: {
     tagline: "For teams & heavy workloads",
     badge: "Best Value",
-    features: ["High-quality optimization", "Priority processing", "Effective CDN delivery"],
+    features: [
+      "High-quality optimization",
+      "Priority processing",
+      "Effective CDN delivery",
+    ],
     icon: Crown,
     gradient: "from-purple-500/20 to-pink-500/20",
   },
@@ -81,11 +98,35 @@ const faqVariants = {
 
 function BillingPage() {
   const router = useRouter();
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/user");
+        setUser(res.data);
+      } catch (err) {
+        console.error("Failed to fetch user data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen px-4 py-16 relative overflow-hidden">
@@ -139,25 +180,56 @@ function BillingPage() {
             const plan = services[key];
             const meta = planMeta[key];
             const Icon = meta.icon;
-            const isFree = key === "free";
             const isPopular = meta.popular;
+
+            const currentPlan = user?.plan || "free";
+            const currentTierIndex = planOrder.indexOf(currentPlan);
+            const planTierIndex = planOrder.indexOf(key);
+
+            const isCurrentPlan = key === currentPlan;
+            const isLowerPlan = planTierIndex < currentTierIndex;
+            const isHigherPlan = planTierIndex > currentTierIndex;
 
             return (
               <motion.div
                 key={key}
                 variants={cardVariants}
-                whileHover={{
-                  y: -8,
-                  transition: { type: "spring", stiffness: 300, damping: 20 }
-                }}
+                whileHover={
+                  isHigherPlan
+                    ? {
+                        y: -8,
+                        transition: {
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20,
+                        },
+                      }
+                    : {}
+                }
                 className={`relative group rounded-3xl p-8 backdrop-blur-xl shadow-xl border transition-all duration-500 ${
-                  isPopular
-                    ? "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 border-primary/50 shadow-primary/20 scale-105"
-                    : "bg-white/10 dark:bg-black/20 border-white/10 hover:border-white/20"
+                  isCurrentPlan
+                    ? "bg-primary/10 border-primary shadow-primary/20 scale-105"
+                    : isPopular && isHigherPlan
+                      ? "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 border-primary/50 shadow-primary/20"
+                      : isLowerPlan
+                        ? "bg-white/5 border-white/5 opacity-60 grayscale"
+                        : "bg-white/10 dark:bg-black/20 border-white/10 hover:border-white/20"
                 }`}
               >
-                {/* Popular Badge */}
-                {meta.badge && (
+                {/* Status Badge */}
+                {isCurrentPlan && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-4 left-1/2 transform -translate-x-1/2"
+                  >
+                    <span className="px-4 py-2 bg-primary text-primary-content text-sm font-bold rounded-full shadow-lg">
+                      Active Plan
+                    </span>
+                  </motion.div>
+                )}
+
+                {meta.badge && isHigherPlan && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -171,7 +243,9 @@ function BillingPage() {
                 )}
 
                 {/* Icon */}
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                <div
+                  className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ${isLowerPlan ? "opacity-50" : ""}`}
+                >
                   <Icon className="w-8 h-8 text-primary" />
                 </div>
 
@@ -196,11 +270,15 @@ function BillingPage() {
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span className="text-sm">{plan.videoLimit} video uploads</span>
+                    <span className="text-sm">
+                      {plan.videoLimit} video uploads
+                    </span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span className="text-sm">{plan.imageLimit} image transformations</span>
+                    <span className="text-sm">
+                      {plan.imageLimit} image transformations
+                    </span>
                   </li>
                   {meta.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-3">
@@ -211,12 +289,19 @@ function BillingPage() {
                 </ul>
 
                 {/* CTA Button */}
-                {isFree ? (
+                {isCurrentPlan ? (
                   <button
                     disabled
-                    className="btn btn-outline w-full rounded-xl cursor-not-allowed opacity-60"
+                    className="btn btn-primary w-full rounded-xl cursor-not-allowed opacity-80"
                   >
                     Current Plan
+                  </button>
+                ) : isLowerPlan ? (
+                  <button
+                    disabled
+                    className="btn btn-ghost border-white/10 w-full rounded-xl cursor-not-allowed opacity-50"
+                  >
+                    Previous Plan
                   </button>
                 ) : (
                   <motion.button
@@ -267,8 +352,12 @@ function BillingPage() {
           className="max-w-4xl mx-auto"
         >
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p className="text-base-content/70">Everything you need to know about our plans</p>
+            <h2 className="text-3xl font-bold mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-base-content/70">
+              Everything you need to know about our plans
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -278,7 +367,11 @@ function BillingPage() {
                 <motion.div
                   key={index}
                   initial={false}
-                  animate={{ backgroundColor: isOpen ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)" }}
+                  animate={{
+                    backgroundColor: isOpen
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(255,255,255,0.05)",
+                  }}
                   className="rounded-2xl p-6 backdrop-blur-xl border border-white/10 shadow-lg cursor-pointer transition-all duration-300 hover:border-white/20"
                   onClick={() => toggleFAQ(index)}
                 >
