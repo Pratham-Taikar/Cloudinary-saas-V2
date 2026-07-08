@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { SignIn } from "@clerk/nextjs";
+
+const REDIRECT_URL = "/home";
 
 export default function Page() {
   return (
@@ -26,6 +29,11 @@ export default function Page() {
         {/* Clerk Sign In */}
         <div className="flex justify-center">
           <SignIn
+            routing="path"
+            path="/sign-in"
+            signUpUrl="/sign-up"
+            forceRedirectUrl={REDIRECT_URL}
+            fallbackRedirectUrl={REDIRECT_URL}
             appearance={{
               variables: {
                 colorPrimary: "hsl(217, 91%, 60%)",
@@ -67,6 +75,16 @@ export default function Page() {
             }}
           />
         </div>
+
+        <p className="mt-6 text-center text-sm text-white/70">
+          New here?{" "}
+          <Link
+            href="/sign-up"
+            className="font-medium text-primary hover:text-primary/80"
+          >
+            Create an account
+          </Link>
+        </p>
       </div>
     </div>
   );
