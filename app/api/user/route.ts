@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import connectDB from "@/lib/db";
+import connectDB, { getDatabaseErrorMessage } from "@/lib/db";
 import User from "@/models/user.models";
 import { checkAndResetSubscription } from "@/lib/subscription";
 
@@ -39,8 +39,11 @@ export async function GET() {
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch or create user" },
-      { status: 500 }
+      {
+        error: "Failed to fetch or create user",
+        details: getDatabaseErrorMessage(error),
+      },
+      { status: 503 }
     );
   }
 }

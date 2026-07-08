@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import connectDB from "@/lib/db";
+import connectDB, { getDatabaseErrorMessage } from "@/lib/db";
 import PaymentHistory from "@/models/payment.models";
 
 export const dynamic = "force-dynamic";
@@ -23,8 +23,8 @@ export async function GET() {
   } catch (error) {
     console.error("Fetch Payments Error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch payment history" },
-      { status: 500 },
+      { error: "Failed to fetch payment history", details: getDatabaseErrorMessage(error) },
+      { status: 503 },
     );
   }
 }

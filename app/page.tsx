@@ -278,7 +278,7 @@ export default function LandingPage() {
           <div className="w-full flex justify-center">
             <div className="w-full sm:w-[80%] md:w-full max-w-md overflow-hidden rounded-xl">
               <img
-                src="https://aicdn.picsart.com/766a2cc1-e87a-4fbd-a3a6-6ac843813705.png"
+                src="./video.png"
                 alt="Video compression"
                 className="w-full h-auto object-cover"
               />

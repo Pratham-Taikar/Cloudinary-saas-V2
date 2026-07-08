@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { auth } from "@clerk/nextjs/server";
-import connectDB from "@/lib/db";
+import connectDB, { getDatabaseErrorMessage } from "@/lib/db";
 import User from "@/models/user.models";
 import services from "@/lib/services";
 
@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error(error);
         return NextResponse.json(
-            { error: "Upload image failed" },
-            { status: 500 }
+            { error: "Upload image failed", details: getDatabaseErrorMessage(error) },
+            { status: 503 }
         );
     }
 }

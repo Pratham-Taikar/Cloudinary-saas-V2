@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { auth } from "@clerk/nextjs/server";
-import connectDB from "@/lib/db";
+import connectDB, { getDatabaseErrorMessage } from "@/lib/db";
 import User from "@/models/user.models";
 import PaymentHistory from "@/models/payment.models";
 import services, { type PlanKey } from "@/lib/services";
@@ -120,8 +120,8 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("VERIFY_UNEXPECTED_ERROR:", error);
     return NextResponse.json(
-      { error: "Internal verification error", details: error.message },
-      { status: 500 },
+      { error: "Internal verification error", details: getDatabaseErrorMessage(error) },
+      { status: 503 },
     );
   }
 }

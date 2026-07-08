@@ -1,4 +1,4 @@
-import connectDB from "@/lib/db";
+import connectDB, { getDatabaseErrorMessage } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -17,9 +17,9 @@ export async function GET() {
       {
         success: false,
         message: "MongoDB connection failed",
-        error: String(error),
+        error: getDatabaseErrorMessage(error),
       },
-      { status: 500 }
+      { status: 503 }
     );
   }
 }

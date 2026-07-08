@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server';
 import Video from '@/models/video.models';
 import User from '@/models/user.models';
-import connectDB from '@/lib/db';
+import connectDB, { getDatabaseErrorMessage } from '@/lib/db';
 import services from '@/lib/services';
 
 cloudinary.config({
@@ -128,8 +128,8 @@ export async function POST( request: NextRequest ){
   } catch (error: any) {
     console.log("Error: ", error)
     return NextResponse.json(
-      { error: "Upload Video Failed"},
-      { status: 500 }
+      { error: "Upload Video Failed", details: getDatabaseErrorMessage(error) },
+      { status: 503 }
     )
   }
 }
