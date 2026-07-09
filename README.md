@@ -313,8 +313,8 @@ cloudinary-saas/
 | Plan | Price | Images/mo | Videos/mo |
 |:---|:---|:---|:---|
 | **Free** | ₹0 | 10 | 3 |
-| **Elite** | ₹149/mo | 75 | 20 |
-| **Mega** | ₹399/mo | 250 | 50 |
+| **Elite** | ₹249/mo | 75 | 20 |
+| **Mega** | ₹649/mo | 250 | 50 |
 
 ### Automated Credit Reset
 
