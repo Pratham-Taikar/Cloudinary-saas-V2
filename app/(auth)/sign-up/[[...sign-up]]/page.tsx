@@ -18,14 +18,14 @@ export default function SignUpPage() {
         border border-white/15 shadow-xl"
       >
         {/* Brand */}
-        <div className="mb-6 text-center">
+        {/* <div className="mb-6 text-center">
           <h1 className="text-xl sm:text-2xl font-semibold tracking-wide">
             EASYUPLOADS
           </h1>
           <p className="mt-1 text-xs sm:text-sm opacity-70">
             Fast and predictable media workflows
           </p>
-        </div>
+        </div> */}
 
         {/* Clerk Sign Up */}
         <div className="flex justify-center">
