@@ -18,13 +18,13 @@ const services: Record<PlanKey, PlanConfig> = {
     name: "Elite",
     videoLimit: 20,
     imageLimit: 75,
-    price: 149,
+    price: 249,
   },
   mega: {
     name: "Mega",
     videoLimit: 50,
     imageLimit: 250,
-    price: 399,
+    price: 649,
   },
 };
 
