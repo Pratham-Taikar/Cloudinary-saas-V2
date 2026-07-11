@@ -6,20 +6,37 @@ import User from '@/models/user.models';
 import connectDB, { getDatabaseErrorMessage } from '@/lib/db';
 import services from '@/lib/services';
 
+export const runtime = "nodejs";
+
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-interface CloudinaryUploadResult{
-  public_id: string
-  bytes: number
-  duration?: number 
-  [key: number] : any
+interface VideoUploadPayload {
+  title?: string;
+  description?: string;
+  publicId?: string;
+  originalSize?: number;
+  compressedSize?: number;
+  duration?: number;
+}
+
+async function deleteUploadedVideo(publicId: string) {
+  try {
+    await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+  } catch (cleanupError) {
+    console.error("Failed to delete orphaned Cloudinary video", cleanupError);
+  }
+}
+
+async function parseJsonBody(request: NextRequest) {
+  return (await request.json()) as VideoUploadPayload;
 }
 
 export async function POST( request: NextRequest ){
+  let uploadedPublicId: string | undefined;
  
   try {
 
@@ -40,9 +57,23 @@ export async function POST( request: NextRequest ){
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const body = await parseJsonBody(request)
+    const { title, description, publicId, originalSize, compressedSize, duration } = body;
+    uploadedPublicId = publicId;
+
+    if (!publicId) {
+      return NextResponse.json(
+        { error: "Uploaded video identifier not found" },
+        { status: 400 }
+      )
+    }
+
     const plan = services[user.plan] || services.free;
 
     if (user.videoCount >= plan.videoLimit) {
+      if (uploadedPublicId) {
+        await deleteUploadedVideo(uploadedPublicId);
+      }
       return NextResponse.json(
         { error: "Video limit reached. Upgrade required." },
         { status: 403 }
@@ -58,53 +89,18 @@ export async function POST( request: NextRequest ){
       )
     }
 
-    const formdata = await request.formData()
-    const file = formdata.get("file") as File | null 
-    const title = formdata.get("title") as string | null
-    const description = formdata.get("description") as string | null
-    const originalSizeStr = formdata.get("originalSize") as Number | null;
-    const originalSize = originalSizeStr ? originalSizeStr : 0;
-
-    if( !file ){
-      return NextResponse.json(
-        { error: "File not found" },
-        { status: 400 }
-      )
-    }
-
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    const promise = await new Promise<CloudinaryUploadResult>(
-      ( resolve, reject ) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          { 
-            resource_type: "video",
-            transformation: [
-              { quality: "auto" },
-              { fetch_format: "mp4" }
-            ],
-            folder: "saas-video-uploads"
-          }, ( error, result ) => {
-            if( error ) reject(error)
-            else resolve(result as CloudinaryUploadResult)
-          }
-        )
-
-        uploadStream.end(buffer)
-      }
-    )
-
     const video = await Video.create({
-      title: title || "No Title",
-      description: description || "",
+      title: title?.trim() || "No Title",
+      description: description?.trim() || "",
       originalSize: Number(originalSize) || 0,
+      compressedSize: Number(compressedSize) || 0,
       userId: String(userId),
-      publicId: String(promise.public_id),
-      duration: Number(promise.duration) | 0,
+      publicId: String(publicId),
+      duration: Number(duration) || 0,
     })
 
     if( !video ){
+      await deleteUploadedVideo(String(publicId));
       return NextResponse.json(
         { error: "Saving Video Failed in db" },
         { status: 500 }
@@ -126,6 +122,9 @@ export async function POST( request: NextRequest ){
     )
 
   } catch (error: any) {
+    if (uploadedPublicId) {
+      await deleteUploadedVideo(uploadedPublicId);
+    }
     console.log("Error: ", error)
     return NextResponse.json(
       { error: "Upload Video Failed", details: getDatabaseErrorMessage(error) },

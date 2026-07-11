@@ -20,7 +20,7 @@ export default function PlansLimitsPage() {
 
       {/* ================= COMPARISON TABLE ================= */}
       <section className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
+        <table className="w-full text-left border-collapse min-w-150">
           <thead>
             <tr className="border-b border-white/10">
               <th className="py-4 font-bold text-white/90">Feature</th>

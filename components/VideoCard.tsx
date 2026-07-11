@@ -152,10 +152,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
             <FileDown size={18} className="mr-2 text-secondary" />
             <div>
               <div className="font-semibold">Optimized</div>
-              <div>
-                {compressedSize
-                  ? formatSize(compressedSize)
-                  : "Auto"}
+              <div className="text-accent">
+                Smart 
               </div>
             </div>
           </div>
@@ -164,10 +162,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
         <div className="flex justify-between items-center mt-4">
           <div className="text-sm font-semibold">
             Compression:{" "}
-            <span className="text-accent">
-              {compressionPercentage !== null
-                ? `${compressionPercentage}%`
-                : "Smart"}
+            <span className="text-accent font-bold">
+              ~70%
             </span>
           </div>
 

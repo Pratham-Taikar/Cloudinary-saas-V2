@@ -94,9 +94,9 @@ export default function ApiReferencePage() {
               </code>
             </div>
             <p className="text-sm text-white/60">
-              Uploads a raw buffer to Cloudinary and increments usage. Returns a{" "}
-              <code className="bg-white/10 px-1 rounded text-xs">publicId</code>{" "}
-              for transformation mapping.
+              Uploads media through the browser, then persists the returned
+              Cloudinary metadata and increments usage after the server-side
+              save succeeds.
             </p>
             <div className="p-5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-white/80">
               {`Body (Multipart):
@@ -121,9 +121,9 @@ Response (201 Created):
               </code>
             </div>
             <p className="text-sm text-white/60">
-              Processes video assets with automated compression. Metadata is
-              persisted in the{" "}
-              <code className="bg-white/10 px-1 rounded text-xs">Video</code>{" "}
+              Generates a signed Cloudinary upload request, sends the file
+              directly from the browser, and persists the returned metadata in
+              the <code className="bg-white/10 px-1 rounded text-xs">Video</code>{" "}
               collection.
             </p>
           </div>

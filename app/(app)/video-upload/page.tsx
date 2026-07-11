@@ -29,6 +29,8 @@ function VideoUpload() {
 
 
   const router = useRouter();
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const cloudinaryApiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -63,7 +65,7 @@ function VideoUpload() {
       return;
     }
 
-    if (file.size >= MAX_FILE_SIZE) {
+    if (file.size > MAX_FILE_SIZE) {
       toast.error("File size is too large (Max 10MB)");
       setFile(null);
       if (fileInputRef.current) {
@@ -74,32 +76,67 @@ function VideoUpload() {
 
     setIsUploading(true);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("title", title.trim());
-    formData.append("description", description.trim());
-    formData.append("originalSize", file.size.toString());
+    if (!cloudName || !cloudinaryApiKey) {
+      toast.error("Video upload is not configured");
+      setIsUploading(false);
+      return;
+    }
 
     try {
-      await axios.post("/api/video-upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          if (!progressEvent.total) return;
+      const signatureResponse = await axios.post("/api/video-upload/signature");
+      const { timestamp, signature, folder } = signatureResponse.data as {
+        timestamp: number;
+        signature: string;
+        folder: string;
+      };
 
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress(percent);
-        },
+      const cloudinaryFormData = new FormData();
+      cloudinaryFormData.append("file", file);
+      cloudinaryFormData.append("api_key", cloudinaryApiKey);
+      cloudinaryFormData.append("timestamp", String(timestamp));
+      cloudinaryFormData.append("signature", signature);
+      cloudinaryFormData.append("folder", folder);
+
+      const uploadResponse = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+        cloudinaryFormData,
+        {
+          onUploadProgress: (progressEvent) => {
+            if (!progressEvent.total) return;
+
+            const percent = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(Math.min(percent, 95));
+          },
+        }
+      );
+
+      const uploadedVideo = uploadResponse.data as {
+        public_id: string;
+        bytes?: number;
+        duration?: number;
+      };
+
+      await axios.post("/api/video-upload", {
+        title: title.trim(),
+        description: description.trim(),
+        publicId: uploadedVideo.public_id,
+        originalSize: file.size,
+        compressedSize: uploadedVideo.bytes || 0,
+        duration: uploadedVideo.duration || 0,
       });
+
+      setUploadProgress(100);
 
       toast.success("Video uploaded successfully");
       router.push("/home");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to upload video");
+      const message = axios.isAxiosError(error)
+        ? error.response?.data?.error || "Failed to upload video"
+        : "Failed to upload video";
+      toast.error(message);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
